@@ -1,8 +1,10 @@
 ﻿using Application.DTO.Request;
 using Application.LekiWMagazynie.Commands;
 using Application.LekiWMagazynie.Queries;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PRO_API.Common;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,7 +13,7 @@ namespace PRO_API.Controllers
 {
     public class LekWMagazynieController : ApiControllerBase
     {
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpGet("{ID_stan_leku}")]
         public async Task<IActionResult> GetLekWMagazynieById(string ID_stan_leku, CancellationToken token)
         {
@@ -29,7 +31,7 @@ namespace PRO_API.Controllers
         }
 
 
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpPost("{ID_lek}")]
         public async Task<IActionResult> AddStanLeku(string ID_lek, StanLekuRequest request, CancellationToken token)
         {
@@ -48,7 +50,7 @@ namespace PRO_API.Controllers
         }
 
 
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpPut("{ID_stan_leku}")]
         public async Task<IActionResult> UpdateStanLeku(string ID_stan_leku, StanLekuRequest request, CancellationToken token)
         {
@@ -69,7 +71,7 @@ namespace PRO_API.Controllers
         }
 
 
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpDelete("{ID_stan_leku}")]
         public async Task<IActionResult> DeleteStanLeku(string ID_stan_leku, CancellationToken token)
         {

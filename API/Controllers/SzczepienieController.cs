@@ -1,8 +1,10 @@
 ﻿using Application.DTO.Requests;
 using Application.Szczepienia.Commands;
 using Application.Szczepienia.Queries;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PRO_API.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +15,7 @@ namespace PRO_API.Controllers
 {
     public class SzczepienieController : ApiControllerBase
     {
-        //[Authorize(Roles = "weterynarz,admin")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpGet("{ID_pacjent}")]
         public async Task<IActionResult> GetSzczepienie(string ID_pacjent, CancellationToken token)
         {
@@ -30,7 +32,7 @@ namespace PRO_API.Controllers
             }
         }
 
-        //[Authorize(Roles = "weterynarz,admin")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpGet("details/{ID_szczepienie}")]
         public async Task<IActionResult> GetSzczepienieDetails(string ID_szczepienie, CancellationToken token)
         {
@@ -47,7 +49,7 @@ namespace PRO_API.Controllers
             }
         }
 
-        //[Authorize(Roles = "weterynarz,admin")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpPost]
         public async Task<IActionResult> AddSzczepienie(SzczepienieRequest szczepienieRequest, CancellationToken token)
         {
@@ -66,7 +68,7 @@ namespace PRO_API.Controllers
             return NoContent();
         }
 
-        //[Authorize(Roles = "weterynarz,admin")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpPut("{ID_szczepienie}")]
         public async Task<IActionResult> UpdateSzczepienie(SzczepienieRequest szczepienieRequest, string ID_szczepienie, CancellationToken token)
         {
@@ -86,7 +88,7 @@ namespace PRO_API.Controllers
             return NoContent();
         }
 
-        [Authorize(Roles = "weterynarz,admin")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpDelete("{ID_szczepienie}")]
         public async Task<IActionResult> DeleteSzczepienie(string ID_szczepienie, CancellationToken token)
         {

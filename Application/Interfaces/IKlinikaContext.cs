@@ -22,9 +22,9 @@ namespace Application.Interfaces
         public DbSet<LekWMagazynie> LekWMagazynies { get; set; }
         public DbSet<Osoba> Osobas { get; }
         public DbSet<Pacjent> Pacjents { get; }
-        public DbSet<Powiadomienie> Powiadomienies { get; set; }
         public DbSet<ReceptaLek> ReceptaLeks { get; set; }
         public DbSet<Receptum> Recepta { get; set; }
+        public DbSet<Rola> Rolas { get; set; }
         public DbSet<Specjalizacja> Specjalizacjas { get; set; }
         public DbSet<Szczepienie> Szczepienies { get; set; }
         public DbSet<Szczepionka> Szczepionkas { get; set; }

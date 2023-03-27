@@ -1,8 +1,10 @@
 ﻿using Application.DTO.Requests;
 using Application.Recepty.Commands;
 using Application.Recepty.Queries;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PRO_API.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +15,7 @@ namespace PRO_API.Controllers
 {
     public class ReceptaController : ApiControllerBase
     {
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpGet("{ID_Klient}")]
         public async Task<IActionResult> GetReceptaKlientList(string ID_Klient, CancellationToken token)
         {
@@ -30,7 +32,7 @@ namespace PRO_API.Controllers
             }
         }
 
-        [Authorize(Roles = "klient")]
+        [AuthorizeRoles(RolaEnum.Klient)]
         [HttpGet("moje_recepty")]
         public async Task<IActionResult> GetReceptaKlientList(CancellationToken token)
         {

@@ -1,7 +1,9 @@
 ﻿using Application.WeterynarzSpecjalizacje.Commands;
 using Application.WeterynarzSpecjalizacje.Queries;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PRO_API.Common;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,7 +12,7 @@ namespace PRO_API.Controllers
 {
     public class WeterynarzSpecjalizacjaController : ApiControllerBase
     {
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpGet("{ID_weterynarz}")]
         public async Task<IActionResult> GetWeterynarzSpecjalizacja(string ID_weterynarz, CancellationToken token)
         {
@@ -27,7 +29,7 @@ namespace PRO_API.Controllers
             }
         }
 
-        [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpPost("{ID_specjalizacja}/{ID_weterynarz}")]
         public async Task<IActionResult> AddSpecjalizacjaToWeterynarz(string ID_specjalizacja, string ID_weterynarz, CancellationToken token)
         {
@@ -46,7 +48,7 @@ namespace PRO_API.Controllers
             return NoContent();
         }
 
-        [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpDelete("{ID_specjalizacja}/{ID_weterynarz}")]
         public async Task<IActionResult> RemoveSpecjalizacjaFromWeterynarz(string ID_specjalizacja, string ID_weterynarz, CancellationToken token)
         {

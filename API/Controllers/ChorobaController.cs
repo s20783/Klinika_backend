@@ -1,11 +1,11 @@
 ﻿using Application.Choroby.Commands;
 using Application.Choroby.Queries;
 using Application.DTO.Requests;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PRO_API.Common;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,18 +13,19 @@ namespace PRO_API.Controllers
 {
     public class ChorobaController : ApiControllerBase
     {
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpGet]
-        public async Task<IActionResult> GetChorobaList(CancellationToken token)
+        public async Task<IActionResult> GetChorobaList(CancellationToken token, string search, int page)
         {
             return Ok(await Mediator.Send(new ChorobaListQuery
             {
-
+                SearchWord = search,
+                Page = page
             }, token));
         }
 
 
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpGet("{ID_Choroba}")]
         public async Task<IActionResult> GetChorobaDetails(string ID_Choroba, CancellationToken token)
         {
@@ -42,7 +43,7 @@ namespace PRO_API.Controllers
         }
 
 
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpPost]
         public async Task<IActionResult> AddChoroba(ChorobaRequest request, CancellationToken token)
         {
@@ -55,15 +56,12 @@ namespace PRO_API.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(new 
-                { 
-                    message = e.Message
-                });
+                return BadRequest(e.Message);
             }
         }
 
 
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpPut("{ID_Choroba}")]
         public async Task<IActionResult> UpdateChoroba(string ID_Choroba, ChorobaRequest request, CancellationToken token)
         {
@@ -77,16 +75,13 @@ namespace PRO_API.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(new
-                {
-                    message = e.Message
-                });
+                return BadRequest(e.Message);
             }
 
         }
 
 
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpDelete("{ID_Choroba}")]
         public async Task<IActionResult> DeleteChoroba(string ID_Choroba, CancellationToken token)
         {

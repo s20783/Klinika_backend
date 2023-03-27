@@ -9,7 +9,7 @@ namespace Domain.Models
     {
         public int IdOsoba { get; set; }
         public int IdZnizka { get; set; }
-        public DateTime? DataPrzyznania { get; set; }
+        public DateTime DataPrzyznania { get; set; }
         public bool CzyWykorzystana { get; set; }
 
         public virtual Klient IdOsobaNavigation { get; set; }

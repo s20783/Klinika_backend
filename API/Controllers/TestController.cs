@@ -15,12 +15,15 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Policy;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using PRO_API.Common;
+using Domain.Enums;
+using System.Collections.Generic;
 
 namespace PRO_API.Controllers
 {
     public class TestController : ApiControllerBase
     {
-        /*private readonly IConfiguration configuration;
+        private readonly IConfiguration configuration;
         private readonly IHashids hashids;
         private readonly KlinikaContext context;
         private readonly IEmailSender _emailSender;
@@ -36,18 +39,18 @@ namespace PRO_API.Controllers
         
 
         [HttpGet]
-        public IActionResult TestHaslo(string plainPassword, string salt)
+        public IActionResult TestHaslo()
         {
             try
             {
-                string hashedPassword = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                    password: plainPassword,
-                    salt: Convert.FromBase64String(salt),
-                    prf: KeyDerivationPrf.HMACSHA512,
-                    iterationCount: 50000,
-                    numBytesRequested: 512 / 8));
+                var roles = new List<RolaEnum>
+                {
+                    RolaEnum.Klient,
+                    RolaEnum.Weterynarz
+                };
+                var Roles = string.Join(",", Array.ConvertAll(roles.ToArray(), x => Enum.GetName(typeof(RolaEnum), x)));
 
-                return Ok(hashedPassword);
+                return Ok(Roles);
             }
             catch (Exception e)
             {
@@ -55,82 +58,5 @@ namespace PRO_API.Controllers
             }
         }
 
-        [HttpGet("hashid/{id}")]
-        public IActionResult GetHashedID(int id)
-        {
-            return Ok(hashids.Encode(id));
-        }
-
-        [HttpGet("time")]
-        public IActionResult GetHashedID(DateTime dateTime, DateTimeOffset dateTimeOffset)
-        {
-            return Ok(new
-            {
-                utc = dateTime.ToUniversalTime(),
-                local = dateTime.ToLocalTime(),
-                offset = dateTimeOffset,
-                offset2 = dateTimeOffset.ToUniversalTime(),
-            });
-        }
-
-        [HttpPost("email/haslo")]
-        public async Task<IActionResult> SendTestEmail()
-        {
-            try
-            {
-                await _emailSender.SendHasloEmail("to@example.com", "**password**");
-
-                return NoContent();
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e);
-            }
-        }
-
-        [HttpPost("email/umowWizyte")]
-        public async Task<IActionResult> SendTestEmail2()
-        {
-            try
-            {
-                await _emailSender.SendUmowWizytaEmail("to@example.com", DateTime.Now, "Zbigniew Nowak");
-
-                return NoContent();
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e);
-            }
-        }
-
-        [HttpPost("email/anulujWizyte")]
-        public async Task<IActionResult> SendTestEmail3()
-        {
-            try
-            {
-                await _emailSender.SendAnulujWizyteEmail("to@example.com", DateTime.Now);
-
-                return NoContent();
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e);
-            }
-        }
-
-        [HttpPost("email/createAccount")]
-        public async Task<IActionResult> SendTestEmail4()
-        {
-            try
-            {
-                await _emailSender.SendCreateAccountEmail("to@example.com");
-
-                return NoContent();
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e);
-            }
-        }*/
     }
 }

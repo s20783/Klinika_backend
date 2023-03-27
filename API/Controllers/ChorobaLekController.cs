@@ -1,7 +1,9 @@
 ﻿using Application.ChorobaLeki.Commands;
 using Application.ChorobaLeki.Queries;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PRO_API.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +14,7 @@ namespace PRO_API.Controllers
 {
     public class ChorobaLekController : ApiControllerBase
     {
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpGet("{ID_lek}")]
         public async Task<IActionResult> GetChorobaLek(string ID_lek, CancellationToken token)
         {
@@ -29,7 +31,7 @@ namespace PRO_API.Controllers
             }
         }
 
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpPost("{ID_choroba}/{ID_lek}")]
         public async Task<IActionResult> AddChorobaToLek(string ID_choroba, string ID_lek, CancellationToken token)
         {
@@ -49,7 +51,7 @@ namespace PRO_API.Controllers
             return NoContent();
         }
 
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpDelete("{ID_choroba}/{ID_lek}")]
         public async Task<IActionResult> RemoveChorobaFromLek(string ID_choroba, string ID_lek, CancellationToken token)
         {

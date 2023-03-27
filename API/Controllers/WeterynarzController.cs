@@ -1,8 +1,11 @@
 ﻿using Application.DTO;
 using Application.Weterynarze.Commands;
 using Application.Weterynarze.Queries;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using PRO_API.Common;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,18 +14,19 @@ namespace PRO_API.Controllers
 {
     public class WeterynarzController : ApiControllerBase
     {
-        [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpGet]
-        public async Task<IActionResult> GetWeterynarzList(CancellationToken token)
+        public async Task<IActionResult> GetWeterynarzList(CancellationToken token, string search, int page)
         {
             return Ok(await Mediator.Send(new WeterynarzListQuery
             {
-                
+                SearchWord = search,
+                Page = page
             }, token));
         }
 
 
-        [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpGet("{ID_osoba}")]
         public async Task<IActionResult> GetWeterynarzById(string ID_osoba, CancellationToken token)
         {
@@ -33,7 +37,7 @@ namespace PRO_API.Controllers
         }
 
 
-        [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpPost]
         public async Task<IActionResult> AddWeterynarz(WeterynarzCreateRequest request, CancellationToken token)
         {
@@ -54,7 +58,7 @@ namespace PRO_API.Controllers
         }
 
 
-        [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpPut("{ID_osoba}")]
         public async Task<IActionResult> UpdateWeterynarz(string ID_osoba, WeterynarzUpdateRequest request, CancellationToken token)
         {
@@ -73,7 +77,7 @@ namespace PRO_API.Controllers
         }
 
 
-        [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpDelete("{ID_osoba}")]
         public async Task<IActionResult> DeleteWeterynarz(string ID_osoba, CancellationToken token)
         {

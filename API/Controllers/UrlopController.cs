@@ -1,8 +1,10 @@
 ﻿using Application.DTO.Requests;
 using Application.Urlopy.Commands;
 using Application.Urlopy.Queries;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PRO_API.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +15,7 @@ namespace PRO_API.Controllers
 {
     public class UrlopController : ApiControllerBase
     {
-      //  [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpGet]
         public async Task<IActionResult> GetUrlopList(CancellationToken token)
         {
@@ -23,7 +25,7 @@ namespace PRO_API.Controllers
             }, token));
         }
 
-       // [Authorize(Roles = "weterynarz")]
+        [AuthorizeRoles(RolaEnum.Weterynarz)]
         [HttpGet("moje_urlopy")]
         public async Task<IActionResult> GetUrlopList2(CancellationToken token)
         {
@@ -33,7 +35,7 @@ namespace PRO_API.Controllers
             }, token));
         }
 
-     //   [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpGet("{ID_weterynarz}")]
         public async Task<IActionResult> GetWeterynarzUrlopList(string ID_weterynarz, CancellationToken token)
         {
@@ -50,7 +52,7 @@ namespace PRO_API.Controllers
             }
         }
 
-       // [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpGet("details/{ID_urlop}")]
         public async Task<IActionResult> GetUrlopDetails(string ID_urlop, CancellationToken token)
         {
@@ -67,7 +69,7 @@ namespace PRO_API.Controllers
             }
         }
 
-       // [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpPost]
         public async Task<IActionResult> AddUrlop(UrlopRequest request, CancellationToken token)
         {
@@ -84,7 +86,7 @@ namespace PRO_API.Controllers
             }
         }
 
-        //[Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpPut("{ID_urlop}")]
         public async Task<IActionResult> UpdateUrlop(string ID_urlop, UrlopRequest request, CancellationToken token)
         {
@@ -104,7 +106,7 @@ namespace PRO_API.Controllers
             return NoContent();
         }
 
-       // [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpDelete("{ID_urlop}")]
         public async Task<IActionResult> DeleteUrlop(string ID_urlop, CancellationToken token)
         {

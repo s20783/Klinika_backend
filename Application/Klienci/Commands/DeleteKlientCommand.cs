@@ -9,6 +9,8 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Enums;
+using System.Security.Cryptography.X509Certificates;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Klienci.Commands
 {
@@ -33,18 +35,14 @@ namespace Application.Klienci.Commands
         {
             int id = hash.Decode(req.ID_osoba);
 
-            var osoba = context.Osobas.First(x => x.IdOsoba == id);
+            var osoba = context.Osobas.Include(x => x.IdRolaNavigation).First(x => x.IdOsoba == id);
             var klient = context.Klients.First(x => x.IdOsoba == id);
 
-            if (!string.IsNullOrEmpty(osoba.Rola))
+            //dodać enum
+            if (!string.IsNullOrEmpty(osoba.IdRolaNavigation.Nazwa))
             {
                 throw new Exception("");
             }
-
-            /*if(context.Wizyta.Where(x => x.IdOsoba== id && !x.CzyOplacona && x.Status.Equals(WizytaStatus.Zrealizowana.ToString())).Any()) 
-            {
-                throw new Exception("Klient ma nieopłaconą wizytę");
-            }*/
             
             using (StreamWriter fileStream = new StreamWriter(new FileStream(@"Klienci.log", FileMode.Append)))
             {

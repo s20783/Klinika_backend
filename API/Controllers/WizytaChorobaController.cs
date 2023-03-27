@@ -1,9 +1,11 @@
 ﻿using Application.WizytaChoroby.Commands;
 using Application.WizytaChoroby.Queries;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
+using PRO_API.Common;
 using System;
 using System.Data;
 using System.Threading;
@@ -13,7 +15,7 @@ namespace PRO_API.Controllers
 {
     public class WizytaChorobaController : ApiControllerBase
     {
-        [Authorize(Roles = "klient,weterynarz,admin")]
+        [Authorize]
         [HttpGet("{ID_wizyta}")]
         public async Task<IActionResult> GetWizytaChorobaList(string ID_wizyta, CancellationToken token)
         {
@@ -30,7 +32,7 @@ namespace PRO_API.Controllers
             }
         }
 
-        [Authorize(Roles = "weterynarz,admin")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpPost("{ID_wizyta}/{ID_choroba}")]
         public async Task<IActionResult> AddWizytaChoroba(string ID_wizyta, string ID_choroba, CancellationToken token)
         {
@@ -50,7 +52,7 @@ namespace PRO_API.Controllers
             return NoContent();
         }
 
-        [Authorize(Roles = "weterynarz,admin")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpDelete("{ID_wizyta}/{ID_choroba}")]
         public async Task<IActionResult> RemoveWizytaChoroba(string ID_wizyta, string ID_choroba, CancellationToken token)
         {

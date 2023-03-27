@@ -40,8 +40,13 @@ namespace Application.Weterynarze.Commands
 
         public async Task<object> Handle(CreateWeterynarzCommand req, CancellationToken cancellationToken)
         {
-            var generatedLogin = "PetMed" + (context.Weterynarzs.Max(x => x.IdOsoba) + 1);
+            var generatedLogin = "PetMed1";
 
+            if (context.Weterynarzs.Any())
+            {
+                generatedLogin = "PetMed" + (context.Weterynarzs.Max(x => x.IdOsoba) + 1);
+            }
+            
             if (context.Osobas.Where(x => x.NazwaUzytkownika.Equals(generatedLogin)).Any())
             {
                 throw new Exception("Not unique");

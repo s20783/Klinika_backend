@@ -7,12 +7,14 @@ using System.Threading;
 using System;
 using Application.WizytaLeki.Queries;
 using Application.WizytaLeki.Commands;
+using Domain.Enums;
+using PRO_API.Common;
 
 namespace PRO_API.Controllers
 {
     public class WizytaLekController : ApiControllerBase
     {
-        [Authorize(Roles = "admin,weterynarz,klient")]
+        [Authorize]
         [HttpGet("{ID_wizyta}")]
         public async Task<IActionResult> GetWizytaLekList(string ID_wizyta, CancellationToken token)
         {
@@ -22,7 +24,7 @@ namespace PRO_API.Controllers
             }, token));
         }
 
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpPost("{ID_wizyta}/{ID_lek}")]
         public async Task<IActionResult> AddWizytaLek(string ID_wizyta, string ID_lek, int Ilosc, CancellationToken token)
         {
@@ -43,7 +45,7 @@ namespace PRO_API.Controllers
             return NoContent();
         }
 
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpDelete("{ID_wizyta}/{ID_lek}")]
         public async Task<IActionResult> RemoveWizytaLek(string ID_wizyta, string ID_lek, CancellationToken token)
         {

@@ -1,9 +1,10 @@
 ﻿using Application.DTO.Request;
 using Application.Specjalizacje.Commands;
 using Application.Specjalizacje.Queries;
-using Application.WeterynarzSpecjalizacje.Commands;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PRO_API.Common;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,17 +13,18 @@ namespace PRO_API.Controllers
 {
     public class SpecjalizacjaController : ApiControllerBase
     {
-        [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpGet]
-        public async Task<IActionResult> GetSpecjalizacjaList(CancellationToken token)
+        public async Task<IActionResult> GetSpecjalizacjaList(CancellationToken token, string search, int page)
         {
             return Ok(await Mediator.Send(new SpecjalizacjaListQuery
             {
-
-            }));
+                SearchWord = search,
+                Page = page
+            }, token));
         }
 
-        [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpGet("details/{ID_specjalizacja}")]
         public async Task<IActionResult> GetSpecjalizacjaById(string ID_specjalizacja, CancellationToken token)
         {
@@ -39,7 +41,7 @@ namespace PRO_API.Controllers
             }
         }
 
-        [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpPost]
         public async Task<IActionResult> AddSpecjalizacja(SpecjalizacjaRequest request, CancellationToken token)
         {
@@ -56,7 +58,7 @@ namespace PRO_API.Controllers
             }
         }
 
-        [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpPut("{ID_specjalizacja}")]
         public async Task<IActionResult> UpdateSpecjalizacja(string ID_specjalizacja, SpecjalizacjaRequest request, CancellationToken token)
         {
@@ -74,7 +76,7 @@ namespace PRO_API.Controllers
             }
         }
 
-        [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpDelete("{ID_specjalizacja}")]
         public async Task<IActionResult> DeleteSpecjalizacja(string ID_specjalizacja, CancellationToken token)
         {

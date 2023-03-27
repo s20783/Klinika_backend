@@ -30,9 +30,9 @@ namespace Infrastructure.Models
         public virtual DbSet<LekWMagazynie> LekWMagazynies { get; set; }
         public virtual DbSet<Osoba> Osobas { get; set; }
         public virtual DbSet<Pacjent> Pacjents { get; set; }
-        public virtual DbSet<Powiadomienie> Powiadomienies { get; set; }
         public virtual DbSet<ReceptaLek> ReceptaLeks { get; set; }
         public virtual DbSet<Receptum> Recepta { get; set; }
+        public virtual DbSet<Rola> Rolas { get; set; }
         public virtual DbSet<Specjalizacja> Specjalizacjas { get; set; }
         public virtual DbSet<Szczepienie> Szczepienies { get; set; }
         public virtual DbSet<Szczepionka> Szczepionkas { get; set; }
@@ -116,8 +116,6 @@ namespace Infrastructure.Models
 
                 entity.ToTable("Godziny_pracy");
 
-                entity.HasIndex(e => e.IdOsoba, "Godziny_Pracy_Osoba_fk");
-
                 entity.Property(e => e.IdGodzinyPracy).HasColumnName("ID_godziny_pracy");
 
                 entity.Property(e => e.DzienTygodnia).HasColumnName("Dzien_tygodnia");
@@ -145,12 +143,6 @@ namespace Infrastructure.Models
                     .HasName("Harmonogram_pk");
 
                 entity.ToTable("Harmonogram");
-
-                entity.HasIndex(e => e.DataRozpoczecia, "Harmonogram_Data_Rozpoczecia_fk");
-
-                entity.HasIndex(e => e.WeterynarzIdOsoba, "Harmonogram_Weterynarz_fk");
-
-                entity.HasIndex(e => e.IdWizyta, "Harmonogram_Wizyta_fk");
 
                 entity.Property(e => e.IdHarmonogram).HasColumnName("ID_harmonogram");
 
@@ -264,8 +256,6 @@ namespace Infrastructure.Models
 
                 entity.ToTable("Lek_w_magazynie");
 
-                entity.HasIndex(e => e.IdLek, "Lek_fk");
-
                 entity.Property(e => e.IdStanLeku).HasColumnName("ID_stan_leku");
 
                 entity.Property(e => e.DataWaznosci)
@@ -309,6 +299,8 @@ namespace Infrastructure.Models
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
+                entity.Property(e => e.IdRola).HasColumnName("ID_rola");
+
                 entity.Property(e => e.Imie)
                     .IsRequired()
                     .HasMaxLength(50)
@@ -328,6 +320,7 @@ namespace Infrastructure.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.NumerTelefonu)
+                    .IsRequired()
                     .HasMaxLength(15)
                     .IsUnicode(false)
                     .HasColumnName("Numer_telefonu");
@@ -338,15 +331,16 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.RefreshTokenExp).HasColumnType("date");
 
-                entity.Property(e => e.Rola)
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength(true);
-
                 entity.Property(e => e.Salt)
                     .IsRequired()
                     .HasMaxLength(64)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.IdRolaNavigation)
+                    .WithMany(p => p.Osobas)
+                    .HasForeignKey(d => d.IdRola)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("Osoba_Rola");
             });
 
             modelBuilder.Entity<Pacjent>(entity =>
@@ -355,8 +349,6 @@ namespace Infrastructure.Models
                     .HasName("Pacjent_pk");
 
                 entity.ToTable("Pacjent");
-
-                entity.HasIndex(e => e.IdOsoba, "Pacjent_Osoba_fk");
 
                 entity.Property(e => e.IdPacjent).HasColumnName("ID_pacjent");
 
@@ -401,48 +393,16 @@ namespace Infrastructure.Models
                     .HasConstraintName("Pacjent_Klient");
             });
 
-            modelBuilder.Entity<Powiadomienie>(entity =>
-            {
-                entity.HasKey(e => e.IdPowiadomienie)
-                    .HasName("Powiadomienie_pk");
-
-                entity.ToTable("Powiadomienie");
-
-                entity.HasIndex(e => e.IdOsoba, "Powiadomienie_Osoba_fk");
-
-                entity.Property(e => e.IdPowiadomienie).HasColumnName("ID_powiadomienie");
-
-                entity.Property(e => e.Data).HasColumnType("datetime");
-
-                entity.Property(e => e.IdOsoba).HasColumnName("ID_osoba");
-
-                entity.Property(e => e.Kategoria)
-                    .IsRequired()
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Tekst)
-                    .IsRequired()
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
-
-                entity.HasOne(d => d.IdOsobaNavigation)
-                    .WithMany(p => p.Powiadomienies)
-                    .HasForeignKey(d => d.IdOsoba)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("Powiadomienie_Osoba");
-            });
-
             modelBuilder.Entity<ReceptaLek>(entity =>
             {
-                entity.HasKey(e => new { e.IdLek, e.IdWizyta })
+                entity.HasKey(e => new { e.IdWizyta, e.IdLek })
                     .HasName("Recepta_lek_pk");
 
                 entity.ToTable("Recepta_lek");
 
-                entity.Property(e => e.IdLek).HasColumnName("ID_lek");
-
                 entity.Property(e => e.IdWizyta).HasColumnName("ID_wizyta");
+
+                entity.Property(e => e.IdLek).HasColumnName("ID_lek");
 
                 entity.HasOne(d => d.IdLekNavigation)
                     .WithMany(p => p.ReceptaLeks)
@@ -467,6 +427,7 @@ namespace Infrastructure.Models
                     .HasColumnName("ID_wizyta");
 
                 entity.Property(e => e.Zalecenia)
+                    .IsRequired()
                     .HasMaxLength(300)
                     .IsUnicode(false);
 
@@ -475,6 +436,23 @@ namespace Infrastructure.Models
                     .HasForeignKey<Receptum>(d => d.IdWizyta)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("Recepta_Wizyta");
+            });
+
+            modelBuilder.Entity<Rola>(entity =>
+            {
+                entity.HasKey(e => e.IdRola)
+                    .HasName("Rola_pk");
+
+                entity.ToTable("Rola");
+
+                entity.Property(e => e.IdRola)
+                    .ValueGeneratedNever()
+                    .HasColumnName("ID_rola");
+
+                entity.Property(e => e.Nazwa)
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<Specjalizacja>(entity =>
@@ -557,8 +535,6 @@ namespace Infrastructure.Models
                     .HasName("Urlop_pk");
 
                 entity.ToTable("Urlop");
-
-                entity.HasIndex(e => e.IdOsoba, "Urlop_Osoba_fk");
 
                 entity.Property(e => e.IdUrlop).HasColumnName("ID_urlop");
 
@@ -728,12 +704,6 @@ namespace Infrastructure.Models
                 entity.HasKey(e => e.IdWizyta)
                     .HasName("Wizyta_pk");
 
-                entity.HasIndex(e => e.IdOsoba, "Wizyta_Osoba_fk");
-
-                entity.HasIndex(e => e.IdPacjent, "Wizyta_Pacjent_fk");
-
-                entity.HasIndex(e => e.IdZnizka, "Wizyta_Znizka_fk");
-
                 entity.Property(e => e.IdWizyta).HasColumnName("ID_wizyta");
 
                 entity.Property(e => e.Cena).HasColumnType("money");
@@ -793,13 +763,9 @@ namespace Infrastructure.Models
 
                 entity.Property(e => e.IdZnizka).HasColumnName("ID_znizka");
 
-                entity.Property(e => e.DoKiedy)
-                    .HasColumnType("date")
-                    .HasColumnName("Do_kiedy");
-
                 entity.Property(e => e.NazwaZnizki)
                     .IsRequired()
-                    .HasMaxLength(40)
+                    .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("Nazwa_znizki");
 

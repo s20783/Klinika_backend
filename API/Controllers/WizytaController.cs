@@ -2,8 +2,10 @@
 using Application.DTO.Requests;
 using Application.Wizyty.Commands;
 using Application.Wizyty.Queries;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PRO_API.Common;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,17 +14,18 @@ namespace PRO_API.Controllers
 {
     public class WizytaController : ApiControllerBase
     {
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpGet]
-        public async Task<IActionResult> GetWizytaList(CancellationToken token)
+        public async Task<IActionResult> GetWizytaList(CancellationToken token, string search, int page)
         {
             return Ok(await Mediator.Send(new WizytaListQuery
             {
-
+                SearchWord = search,
+                Page = page
             }, token));
         }
 
-        [Authorize(Roles = "klient,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpGet("moje_wizyty")]
         public async Task<IActionResult> GetWizytaKlient(CancellationToken token)
         {
@@ -46,7 +49,7 @@ namespace PRO_API.Controllers
             }
         }
 
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpGet("{ID_klient}")]
         public async Task<IActionResult> GetWizytaKlient(string ID_klient, CancellationToken token)
         {
@@ -146,7 +149,7 @@ namespace PRO_API.Controllers
             }
         }
 
-        [Authorize(Roles = "weterynarz")]
+        [AuthorizeRoles(RolaEnum.Weterynarz)]
         [HttpPost]
         public async Task<IActionResult> AddWizyta(string ID_Harmonogram, string ID_Pacjent, CancellationToken token)    //klient albo weterynarz lub admin umówia wizytę dla klienta (telefonicznie albo na miejscu)
         {
@@ -205,7 +208,7 @@ namespace PRO_API.Controllers
             }
         }
 
-        [Authorize(Roles = "weterynarz")]
+        [AuthorizeRoles(RolaEnum.Weterynarz)]
         [HttpPut("{ID_wizyta}")]
         public async Task<IActionResult> UpdateWizytaInfo(WizytaInfoUpdateRequest request, string ID_wizyta, CancellationToken token)    //weterynarz zmienia informacje o wizycie (opis, status, dodaje wykonane usługi)
         {
@@ -253,7 +256,7 @@ namespace PRO_API.Controllers
             }
         }
 
-        [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpDelete("admin/{ID_wizyta}")]
         public async Task<IActionResult> DeleteWizytaByKlinika(string ID_wizyta, CancellationToken token)    //admin anuluje wizytę, status wizyty ustawiony jako anulowany przez klinike
         {

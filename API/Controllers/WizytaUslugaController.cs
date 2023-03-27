@@ -9,12 +9,14 @@ using Application.WizytaUslugi.Queries;
 using Application.Wizyty.Queries;
 using System;
 using Application.WizytaUslugi.Commands;
+using Domain.Enums;
+using PRO_API.Common;
 
 namespace PRO_API.Controllers
 {
     public class WizytaUslugaController : ApiControllerBase
     {
-        [Authorize(Roles = "admin,weterynarz,klient")]
+        [Authorize]
         [HttpGet("{ID_wizyta}")]
         public async Task<IActionResult> GetWizytaUslugaList(string ID_wizyta, CancellationToken token)
         {
@@ -32,7 +34,7 @@ namespace PRO_API.Controllers
             }, token));
         }
 
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpPost("{ID_wizyta}/{ID_usluga}")]
         public async Task<IActionResult> AddWizytaUsluga(string ID_wizyta, string ID_usluga, CancellationToken token)
         {
@@ -52,7 +54,7 @@ namespace PRO_API.Controllers
             return NoContent();
         }
 
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpPut("accept/{ID_wizyta}")]
         public async Task<IActionResult> AcceptWizytaUsluga(string ID_wizyta, CancellationToken token)
         {
@@ -71,7 +73,7 @@ namespace PRO_API.Controllers
             return NoContent();
         }
 
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpDelete("{ID_wizyta}/{ID_usluga}")]
         public async Task<IActionResult> RemoveWizytaUsluga(string ID_wizyta, string ID_usluga, CancellationToken token)
         {

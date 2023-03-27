@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.DTO.Responses
 {
-    public class PacjentWizytaResponse
+    public class GetPacjentWizytaResponse
     {
         public DateTime Data { get; set; }
         public string Status { get; set; }

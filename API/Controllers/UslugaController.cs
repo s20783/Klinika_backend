@@ -1,11 +1,11 @@
 ﻿using Application.DTO.Requests;
 using Application.Uslugi.Commands;
 using Application.Uslugi.Queries;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PRO_API.Common;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,17 +13,18 @@ namespace PRO_API.Controllers
 {
     public class UslugaController : ApiControllerBase
     {
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpGet]
-        public async Task<IActionResult> GetUslugaList(CancellationToken token)
+        public async Task<IActionResult> GetUslugaList(CancellationToken token, string search, int page)
         {
             return Ok(await Mediator.Send(new UslugaListQuery
             {
-
+                SearchWord = search,
+                Page = page
             }, token));
         }
 
-        [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpGet("details/{ID_usluga}")]
         public async Task<IActionResult> GetUslugaDetails(string ID_usluga, CancellationToken token)
         {
@@ -74,7 +75,7 @@ namespace PRO_API.Controllers
             }
         }
 
-        [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpPost]
         public async Task<IActionResult> AddUsluga(UslugaRequest request, CancellationToken token)
         {
@@ -91,7 +92,7 @@ namespace PRO_API.Controllers
             }
         }
 
-        [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpPut("{ID_usluga}")]
         public async Task<IActionResult> UpdateUsluga(string ID_usluga, UslugaRequest request, CancellationToken token)
         {
@@ -111,7 +112,7 @@ namespace PRO_API.Controllers
             return NoContent();
         }
 
-        [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpDelete("{ID_usluga}")]
         public async Task<IActionResult> DeleteUsluga(string ID_usluga, CancellationToken token)
         {

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Application.Common.Exceptions;
 using Microsoft.Extensions.Configuration;
 using Domain;
+using Domain.Enums;
 
 namespace Application.Konto.Commands
 {
@@ -55,22 +56,20 @@ namespace Application.Konto.Commands
 
             string userRola = "";
 
-            if (user.Rola != null)
+
+            if (user.IdRola == ((int)RolaEnum.Admin))
             {
-                if (user.Rola.Equals("A"))
-                {
-                    userclaim.Add(new Claim(ClaimTypes.Role, "admin"));
-                    userRola = "admin";
-                }
-                if (user.Rola.Equals("W"))
-                {
-                    userclaim.Add(new Claim(ClaimTypes.Role, "weterynarz"));
-                    userRola = "weterynarz";
-                }
+                userclaim.Add(new Claim(ClaimTypes.Role, "Admin"));
+                userRola = "admin";
+            }
+            else if (user.IdRola == ((int)RolaEnum.Weterynarz))
+            {
+                userclaim.Add(new Claim(ClaimTypes.Role, "Weterynarz"));
+                userRola = "weterynarz";
             }
             else
             {
-                userclaim.Add(new Claim(ClaimTypes.Role, "klient"));
+                userclaim.Add(new Claim(ClaimTypes.Role, "Klient"));
                 userRola = "user";
             }
 

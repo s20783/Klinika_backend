@@ -1,6 +1,8 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using Domain;
 using MediatR;
+using ServiceLayer.DTO.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,12 +12,13 @@ using System.Threading.Tasks;
 
 namespace Application.Pacjenci.Queries
 {
-    public class PacjentListQuery : IRequest<List<GetPacjentListResponse>>
+    public class PacjentListQuery : IRequest<PaginatedResponse<GetPacjentListResponse>>
     {
-
+        public string? SearchWord { get; set; }
+        public int Page { get; set; } = 1;
     }
 
-    public class GetPacjentListQueryHandle : IRequestHandler<PacjentListQuery, List<GetPacjentListResponse>>
+    public class GetPacjentListQueryHandle : IRequestHandler<PacjentListQuery, PaginatedResponse<GetPacjentListResponse>>
     {
         private readonly IKlinikaContext context;
         private readonly IHash hash;
@@ -27,7 +30,7 @@ namespace Application.Pacjenci.Queries
             cache = _cache;
         }
 
-        public async Task<List<GetPacjentListResponse>> Handle(PacjentListQuery req, CancellationToken cancellationToken)
+        public async Task<PaginatedResponse<GetPacjentListResponse>> Handle(PacjentListQuery req, CancellationToken cancellationToken)
         {
             List<GetPacjentListResponse> data;
             data = cache.GetFromCache();
@@ -51,7 +54,25 @@ namespace Application.Pacjenci.Queries
                 cache.AddToCache(data);
             }
 
-            return data;
+            var results = data
+                .Where(
+                x => req.SearchWord == null ||
+                x.Nazwa.ToLower().Contains(req.SearchWord.ToLower()) ||
+                x.Gatunek.ToLower().Contains(req.SearchWord.ToLower()) ||
+                x.Rasa.ToLower().Contains(req.SearchWord.ToLower()) ||
+                x.Wlasciciel.ToLower().Contains(req.SearchWord.ToLower())
+                )
+                .OrderBy(x => x.Nazwa);
+
+            return new PaginatedResponse<GetPacjentListResponse>
+            {
+                Items = results
+                    .Skip((req.Page - 1) * GlobalValues.PAGE_SIZE)
+                    .Take(GlobalValues.PAGE_SIZE)
+                    .ToList(),
+                PageCount = (int)Math.Ceiling(results.Count() / (double)GlobalValues.PAGE_SIZE),
+                PageIndex = req.Page
+            };
         }
     }
 }

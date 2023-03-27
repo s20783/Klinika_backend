@@ -1,7 +1,9 @@
 ﻿using Application.Harmonogramy.Commands;
 using Application.Harmonogramy.Queries;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PRO_API.Common;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,7 +13,7 @@ namespace PRO_API.Controllers
     public class HarmonogramController : ApiControllerBase
     {
         //ustawia harmonogramy (według godzin pracy) weterynarzom na tydzień do przodu względem ostatniego harmonogramu w systemie
-        [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpPost("auto")]
         public async Task<IActionResult> AddHarmonogramsForAWeek(CancellationToken token)
         {
@@ -30,7 +32,7 @@ namespace PRO_API.Controllers
 
         //ustawia harmonogramy weterynarzom od dzisiejszej daty do daty ostatniego harmonogramu w systemie
         //(może być użyty w przypadku nowych weterynarzy)
-        [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpPut("auto")]
         public async Task<IActionResult> AddWeterynarzHarmonograms(CancellationToken token)
         {
@@ -105,8 +107,8 @@ namespace PRO_API.Controllers
             }
         }*/
 
-        
-        //[Authorize(Roles = "admin")]
+
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpDelete("day/{ID_osoba}")]
         public async Task<IActionResult> DeleteWeterynarzHarmonogramForADay(DateTime date, string ID_osoba, CancellationToken token)
         {
@@ -126,7 +128,7 @@ namespace PRO_API.Controllers
 
 
         //klient umawia wizytę albo pracownik kliniki umówia wizytę na prośbę klienta
-        [Authorize(Roles = "klient,weterynarz,admin")]
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetHarmonogram(DateTime date, CancellationToken token)
         {
@@ -145,7 +147,7 @@ namespace PRO_API.Controllers
 
 
         //admin wyświetla harmonogram weterynarza
-        [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpGet("klinika/{ID_osoba}")]
         public async Task<IActionResult> GetKlinikaAdminHarmonogram(string ID_osoba, DateTime Date, CancellationToken token)
         {
@@ -164,7 +166,7 @@ namespace PRO_API.Controllers
         }
 
 
-        [Authorize(Roles = "weterynarz,admin")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpGet("klinika")]
         public async Task<IActionResult> GetKlinikaHarmonogram(DateTime date, CancellationToken token)
         {

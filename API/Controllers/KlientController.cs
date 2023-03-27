@@ -2,8 +2,10 @@
 using Application.DTO.Requests;
 using Application.Klienci.Commands;
 using Application.Klienci.Queries;
+using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PRO_API.Common;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,18 +14,19 @@ namespace PRO_API.Controllers
 {
     public class KlientController : ApiControllerBase
     {
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpGet]
-        public async Task<IActionResult> GetKlientList(CancellationToken token)
+        public async Task<IActionResult> GetKlientList(CancellationToken token, string search, int page)
         {
             return Ok(await Mediator.Send(new KlientListQuery
             {
-
+                SearchWord = search,
+                Page = page
             }, token));
         }
 
 
-        [Authorize(Roles = "admin,weterynarz")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpGet("{ID_osoba}")]
         public async Task<IActionResult> GetKlientById(string ID_osoba, CancellationToken token)
         {
@@ -58,7 +61,7 @@ namespace PRO_API.Controllers
             }
         }
 
-        [Authorize(Roles = "weterynarz,admin")]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpPost("Klinika")]
         public async Task<IActionResult> AddKlient(KlientCreateKlinikaRequest request, CancellationToken token)
         {
@@ -76,7 +79,7 @@ namespace PRO_API.Controllers
         }
 
 
-        [Authorize(Roles = "klient")]
+        [AuthorizeRoles(RolaEnum.Klient)]
         [HttpDelete]
         public async Task<IActionResult> DeleteKlient(CancellationToken token)
         {
@@ -98,7 +101,7 @@ namespace PRO_API.Controllers
             return NoContent();
         }
 
-        [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpDelete("admin/{ID_osoba}")]
         public async Task<IActionResult> DeleteKlientByAdmin(string ID_osoba, CancellationToken token)
         {

@@ -21,7 +21,7 @@ namespace Test
                     NumerTelefonu = "123456789",
                     Salt = "ayH570KmANkGyHqQroN6Nl30mclzaC6Rxfq4SedA+C4=",
                     Haslo = "TP506vFmQn79Wumsfl012OL3XCvaDsnKGBsjZbRYrZdjnZOrtdaKpyK9VxDN5/+faDZwWUuT2xLbDv0gegrWAg==",
-                    Rola = ""
+                    IdRola = 2
                 },
                 new Osoba       //weterynarz
                 {

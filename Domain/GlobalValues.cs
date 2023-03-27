@@ -11,7 +11,8 @@ namespace Domain
         public readonly static int GODZINY_DO_ANULOWANIA_WIZYTY_BEZ_KONSEKWENCJI = 4;
         public readonly static int LICZBA_PROB = 12;
         public readonly static int GODZINY_BLOKADY = 1;
-        public readonly static int DLUGOSC_WIZYTY = 30;
+        public readonly static int DLUGOSC_WIZYTY = 30; //minuty
         public readonly static string SZCZEPIONKA_JEDNOSTKA = "ml";
+        public readonly static int PAGE_SIZE = 5;
     }
 }

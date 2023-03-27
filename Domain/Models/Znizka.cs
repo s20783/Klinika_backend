@@ -16,7 +16,6 @@ namespace Domain.Models
         public int IdZnizka { get; set; }
         public string NazwaZnizki { get; set; }
         public decimal ProcentZnizki { get; set; }
-        public DateTime? DoKiedy { get; set; }
 
         public virtual ICollection<KlientZnizka> KlientZnizkas { get; set; }
         public virtual ICollection<Wizytum> Wizyta { get; set; }

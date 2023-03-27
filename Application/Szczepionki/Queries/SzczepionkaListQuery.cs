@@ -1,6 +1,8 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using Domain;
 using MediatR;
+using ServiceLayer.DTO.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,12 +12,13 @@ using System.Threading.Tasks;
 
 namespace Application.Szczepionki.Queries
 {
-    public class SzczepionkaListQuery : IRequest<List<GetSzczepionkaResponse>>
+    public class SzczepionkaListQuery : IRequest<PaginatedResponse<GetSzczepionkaResponse>>
     {
-
+        public string? SearchWord { get; set; }
+        public int Page { get; set; } = 1;
     }
 
-    public class SzczepionkaListQueryHandler : IRequestHandler<SzczepionkaListQuery, List<GetSzczepionkaResponse>>
+    public class SzczepionkaListQueryHandler : IRequestHandler<SzczepionkaListQuery, PaginatedResponse<GetSzczepionkaResponse>>
     {
         private readonly IKlinikaContext context;
         private readonly IHash hash;
@@ -25,9 +28,9 @@ namespace Application.Szczepionki.Queries
             hash = _hash;
         }
 
-        public async Task<List<GetSzczepionkaResponse>> Handle(SzczepionkaListQuery req, CancellationToken cancellationToken)
+        public async Task<PaginatedResponse<GetSzczepionkaResponse>> Handle(SzczepionkaListQuery req, CancellationToken cancellationToken)
         {
-            return (from x in context.Szczepionkas
+            var data = (from x in context.Szczepionkas
                     join y in context.Leks on x.IdLek equals y.IdLek
                     orderby y.Nazwa
                     select new GetSzczepionkaResponse()
@@ -39,6 +42,25 @@ namespace Application.Szczepionki.Queries
                         OkresWaznosci = x.OkresWaznosci != null ? TimeSpan.FromTicks((long)x.OkresWaznosci).Days : null,
                         Zastosowanie = x.Zastosowanie
                     }).ToList();
+
+            var results = data
+                .Where(
+                x => req.SearchWord == null ||
+                x.Nazwa.ToLower().Contains(req.SearchWord.ToLower()) ||
+                x.Zastosowanie.ToLower().Contains(req.SearchWord.ToLower()) ||
+                x.Producent.ToLower().Contains(req.SearchWord.ToLower())
+                )
+                .OrderBy(x => x.Nazwa);
+
+            return new PaginatedResponse<GetSzczepionkaResponse>
+            {
+                Items = results
+                    .Skip((req.Page - 1) * GlobalValues.PAGE_SIZE)
+                    .Take(GlobalValues.PAGE_SIZE)
+                    .ToList(),
+                PageCount = (int)Math.Ceiling(results.Count() / (double)GlobalValues.PAGE_SIZE),
+                PageIndex = req.Page
+            };
         }
     }
 }

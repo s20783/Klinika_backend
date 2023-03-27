@@ -1,6 +1,8 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using Domain;
 using MediatR;
+using ServiceLayer.DTO.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,12 +12,13 @@ using System.Threading.Tasks;
 
 namespace Application.Specjalizacje.Queries
 {
-    public class SpecjalizacjaListQuery : IRequest<List<GetSpecjalizacjaResponse>>
+    public class SpecjalizacjaListQuery : IRequest<PaginatedResponse<GetSpecjalizacjaResponse>>
     {
-
+        public string? SearchWord { get; set; }
+        public int Page { get; set; } = 1;
     }
 
-    public class SpecjalizacjaListQueryHandle : IRequestHandler<SpecjalizacjaListQuery, List<GetSpecjalizacjaResponse>>
+    public class SpecjalizacjaListQueryHandle : IRequestHandler<SpecjalizacjaListQuery, PaginatedResponse<GetSpecjalizacjaResponse>>
     {
         private readonly IKlinikaContext context;
         private readonly IHash hash;
@@ -27,7 +30,7 @@ namespace Application.Specjalizacje.Queries
             cache = _cache;
         }
 
-        public async Task<List<GetSpecjalizacjaResponse>> Handle(SpecjalizacjaListQuery req, CancellationToken cancellationToken)
+        public async Task<PaginatedResponse<GetSpecjalizacjaResponse>> Handle(SpecjalizacjaListQuery req, CancellationToken cancellationToken)
         {
             List<GetSpecjalizacjaResponse> data = cache.GetFromCache();
 
@@ -41,9 +44,27 @@ namespace Application.Specjalizacje.Queries
                             Nazwa = x.Nazwa,
                             Opis = x.Opis
                         }).AsParallel().WithCancellation(cancellationToken).ToList();
+
+                cache.AddToCache(data);
             }
 
-            return data;
+            var results = data
+                .Where(
+                x => req.SearchWord == null ||
+                x.Nazwa.ToLower().Contains(req.SearchWord.ToLower()) ||
+                x.Opis.ToLower().Contains(req.SearchWord.ToLower())
+                )
+                .OrderBy(x => x.Nazwa);
+
+            return new PaginatedResponse<GetSpecjalizacjaResponse>
+            {
+                Items = results
+                    .Skip((req.Page - 1) * GlobalValues.PAGE_SIZE)
+                    .Take(GlobalValues.PAGE_SIZE)
+                    .ToList(),
+                PageCount = (int)Math.Ceiling(results.Count() / (double)GlobalValues.PAGE_SIZE),
+                PageIndex = req.Page
+            };
         }
     }
 }

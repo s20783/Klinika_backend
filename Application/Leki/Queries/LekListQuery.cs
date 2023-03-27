@@ -1,7 +1,9 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using Domain;
 using MediatR;
 using Microsoft.Extensions.Configuration;
+using ServiceLayer.DTO.Responses;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -13,12 +15,13 @@ using System.Threading.Tasks;
 
 namespace Application.Leki.Queries
 {
-    public class LekListQuery : IRequest<List<GetLekListResponse>>
+    public class LekListQuery : IRequest<PaginatedResponse<GetLekListResponse>>
     {
-
+        public string? SearchWord { get; set; }
+        public int Page { get; set; } = 1;
     }
 
-    public class GetLekListQueryHandle : IRequestHandler<LekListQuery, List<GetLekListResponse>>
+    public class GetLekListQueryHandle : IRequestHandler<LekListQuery, PaginatedResponse<GetLekListResponse>>
     {
         private readonly IConfiguration configuration;
         private readonly IHash hash;
@@ -28,7 +31,7 @@ namespace Application.Leki.Queries
             hash = _hash;
         }
 
-        public async Task<List<GetLekListResponse>> Handle(LekListQuery req, CancellationToken cancellationToken)
+        public async Task<PaginatedResponse<GetLekListResponse>> Handle(LekListQuery req, CancellationToken cancellationToken)
         {
             var query = "SELECT l.ID_lek, l.Nazwa, SUM(ISNULL(ilosc, 0)) AS Ilosc, l.Jednostka_Miary, l.Producent FROM Lek l " +
                 "LEFT join LeK_w_magazynie m on m.ID_lek = l.ID_lek " +
@@ -57,7 +60,24 @@ namespace Application.Leki.Queries
             await reader.CloseAsync();
             await connection.CloseAsync();
 
-            return list;
+            var results = list
+                .Where(
+                x => req.SearchWord == null ||
+                x.Nazwa.ToLower().Contains(req.SearchWord.ToLower()) ||
+                x.JednostkaMiary.ToLower().Contains(req.SearchWord.ToLower()) ||
+                x.Producent.ToLower().Contains(req.SearchWord.ToLower())
+                )
+                .OrderBy(x => x.Nazwa);
+
+            return new PaginatedResponse<GetLekListResponse>
+            {
+                Items = results
+                    .Skip((req.Page - 1) * GlobalValues.PAGE_SIZE)
+                    .Take(GlobalValues.PAGE_SIZE)
+                    .ToList(),
+                PageCount = (int)Math.Ceiling(results.Count() / (double)GlobalValues.PAGE_SIZE),
+                PageIndex = req.Page
+            };
         }
     }
 }

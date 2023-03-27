@@ -12,7 +12,7 @@ namespace Infrastructure.Services.Caching
     public class WeterynarzCache : ICache<GetWeterynarzListResponse>
     {
         private readonly IMemoryCache memoryChache;
-        private readonly string KEY = "Usluga";
+        private readonly string KEY = "Weterynarz";
         public WeterynarzCache(IMemoryCache cache)
         {
             memoryChache = cache;

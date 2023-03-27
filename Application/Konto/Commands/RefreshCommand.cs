@@ -1,6 +1,7 @@
 ﻿using Application.Common.Exceptions;
 using Application.DTO.Requests;
 using Application.Interfaces;
+using Domain.Enums;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -47,17 +48,17 @@ namespace Application.Konto.Commands
                 new Claim("login", user.NazwaUzytkownika)
             };
 
-            if (user.Rola.Equals("A"))
+            if (user.IdRola == ((int)RolaEnum.Admin))
             {
-                userclaim.Add(new Claim(ClaimTypes.Role, "admin"));
+                userclaim.Add(new Claim(ClaimTypes.Role, "Admin"));
             }
-            else if (user.Rola.Equals("W"))
+            else if (user.IdRola == ((int)RolaEnum.Weterynarz))
             {
-                userclaim.Add(new Claim(ClaimTypes.Role, "weterynarz"));
+                userclaim.Add(new Claim(ClaimTypes.Role, "Weterynarz"));
             }
             else
             {
-                userclaim.Add(new Claim(ClaimTypes.Role, "klient"));
+                userclaim.Add(new Claim(ClaimTypes.Role, "Klient"));
             }
 
             var token = tokenRepository.GetJWT(userclaim);
