@@ -17,24 +17,24 @@ namespace Application.Leki.Commands
 
     public class UpdateLekCommandHandler : IRequestHandler<UpdateLekCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public UpdateLekCommandHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public UpdateLekCommandHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(UpdateLekCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_lek);
+            int id = _hash.Decode(req.ID_lek);
 
-            var lek = context.Leks.Where(x => x.IdLek.Equals(id)).First();
+            var lek = _context.Leks.Where(x => x.IdLek.Equals(id)).First();
             lek.Nazwa = req.request.Nazwa;
             lek.JednostkaMiary = req.request.JednostkaMiary;
             lek.Producent = req.request.Producent;
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

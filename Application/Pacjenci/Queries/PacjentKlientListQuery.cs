@@ -1,6 +1,8 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,40 +17,28 @@ namespace Application.Pacjenci.Queries
         public string ID_osoba { get; set; }
     }
 
-    public class PacjentKlientListQueryHandle : IRequestHandler<PacjentKlientListQuery, List<GetPacjentKlientListResponse>>
+    public class PacjentKlientListQueryHandler : IRequestHandler<PacjentKlientListQuery, List<GetPacjentKlientListResponse>>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public PacjentKlientListQueryHandle(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IMapper _mapper;
+        public PacjentKlientListQueryHandler(IKlinikaContext klinikaContext, IHash hash, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
+            _mapper = mapper;
         }
+
 
         public async Task<List<GetPacjentKlientListResponse>> Handle(PacjentKlientListQuery req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_osoba);
+            int id = _hash.Decode(req.ID_osoba);
 
-            if (context.Klients.Where(x => x.IdOsoba == id).Any() != true)
-            {
-                throw new Exception("Nie ma klienta o ID = " + req.ID_osoba);
-            }
-
-            var results =
-            (from x in context.Pacjents
-             where x.IdOsoba == id
-             orderby x.Nazwa
-             select new GetPacjentKlientListResponse()
-             {
-                 IdPacjent = hash.Encode(x.IdPacjent),
-                 Nazwa = x.Nazwa,
-                 Gatunek = x.Gatunek,
-                 Rasa = x.Rasa,
-                 Plec = x.Plec,
-                 Agresywne = x.Agresywne
-             }).AsParallel().WithCancellation(cancellationToken).ToList();
-
-            return results;
+            return _mapper.Map<List<GetPacjentKlientListResponse>>(await _context.Pacjents
+                    .Where(x => x.IdOsoba == id)
+                    .OrderBy(x => x.Nazwa)
+                    .ToListAsync(cancellationToken)
+                    );
         }
     }
 }

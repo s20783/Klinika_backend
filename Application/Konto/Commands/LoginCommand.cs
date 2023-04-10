@@ -10,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Common.Exceptions;
 using Microsoft.Extensions.Configuration;
-using Domain;
 using Domain.Enums;
 
 namespace Application.Konto.Commands
@@ -22,35 +21,35 @@ namespace Application.Konto.Commands
 
     public class LoginCommandHandle : IRequestHandler<LoginCommand, LoginTokens>
     {
-        private readonly IKlinikaContext context;
-        private readonly ITokenRepository tokenRepository;
-        private readonly IPasswordRepository passwordRepository;
-        private readonly IConfiguration configuration;
-        private readonly IHash hash;
-        private readonly ILoginRepository loginRepository;
-        public LoginCommandHandle(IKlinikaContext klinikaContext, ITokenRepository token, IPasswordRepository password, IConfiguration config, IHash _hash, ILoginRepository login)
+        private readonly IKlinikaContext _context;
+        private readonly IToken _tokenRepository;
+        private readonly IPassword _passwordRepository;
+        private readonly IConfiguration _configuration;
+        private readonly IHash _hash;
+        private readonly ILogin _loginRepository;
+        public LoginCommandHandle(IKlinikaContext klinikaContext, IToken token, IPassword password, IConfiguration config, IHash hash, ILogin login)
         {
-            context = klinikaContext;
-            tokenRepository = token;
-            passwordRepository = password;
-            configuration = config;
-            hash = _hash;
-            loginRepository = login;
+            _context = klinikaContext;
+            _tokenRepository = token;
+            _passwordRepository = password;
+            _configuration = config;
+            _hash = hash;
+            _loginRepository = login;
         }
 
         public async Task<LoginTokens> Handle(LoginCommand req, CancellationToken cancellationToken)
         {
-            var user = context.Osobas.Where(x => x.NazwaUzytkownika.Equals(req.request.NazwaUzytkownika)).FirstOrDefault();
+            var user = _context.Osobas.Where(x => x.NazwaUzytkownika.Equals(req.request.NazwaUzytkownika)).FirstOrDefault();
 
-            if (!loginRepository.CheckCredentails(user, passwordRepository, req.request.Haslo, int.Parse(configuration["PasswordIterations"])))
+            if (!_loginRepository.CheckCredentails(user, _passwordRepository, req.request.Haslo, int.Parse(_configuration["PasswordIterations"])))
             {
-                await context.SaveChangesAsync(cancellationToken);
+                await _context.SaveChangesAsync(cancellationToken);
                 throw new UserNotAuthorizedException("Incorrect");
             }
 
             List<Claim> userclaim = new List<Claim>
             {
-                new Claim("idUser", hash.Encode(user.IdOsoba)),
+                new Claim("idUser", _hash.Encode(user.IdOsoba)),
                 new Claim("login", user.NazwaUzytkownika)
             };
 
@@ -73,12 +72,12 @@ namespace Application.Konto.Commands
                 userRola = "user";
             }
 
-            var token = tokenRepository.GetJWT(userclaim);
+            var token = _tokenRepository.GetJWT(userclaim);
 
             var refreshToken = Guid.NewGuid().ToString();
             user.RefreshToken = refreshToken;
             user.RefreshTokenExp = DateTime.Now.AddDays(1);
-            await context.SaveChangesAsync(cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
 
             return new LoginTokens()
             {

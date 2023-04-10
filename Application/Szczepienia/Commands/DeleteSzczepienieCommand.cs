@@ -16,22 +16,22 @@ namespace Application.Szczepienia.Commands
 
     public class DeleteSzczepienieCommandHandler : IRequestHandler<DeleteSzczepienieCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public DeleteSzczepienieCommandHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public DeleteSzczepienieCommandHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(DeleteSzczepienieCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_szczepienie);
+            int id = _hash.Decode(req.ID_szczepienie);
 
-            var szczepienie = context.Szczepienies.Where(x => x.IdSzczepienie.Equals(id)).First();
-            context.Szczepienies.Remove(szczepienie);
+            var szczepienie = _context.Szczepienies.Where(x => x.IdSzczepienie.Equals(id)).First();
+            _context.Szczepienies.Remove(szczepienie);
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

@@ -17,25 +17,25 @@ namespace Application.Uslugi.Commands
 
     public class DeleteUslugaCommandHandler : IRequestHandler<DeleteUslugaCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly ICache<GetUslugaResponse> cache;
-        public DeleteUslugaCommandHandler(IKlinikaContext klinikaContext, IHash ihash, ICache<GetUslugaResponse> _cache)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly ICache<GetUslugaResponse> _cache;
+        public DeleteUslugaCommandHandler(IKlinikaContext klinikaContext, IHash ihash, ICache<GetUslugaResponse> cache)
         {
-            context = klinikaContext;
-            hash = ihash;
-            cache = _cache;
+            _context = klinikaContext;
+            _hash = ihash;
+            _cache = cache;
         }
 
         public async Task<int> Handle(DeleteUslugaCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_usluga);
+            int id = _hash.Decode(req.ID_usluga);
 
-            context.WizytaUslugas.RemoveRange(context.WizytaUslugas.Where(x => x.IdUsluga.Equals(id)).ToList());
-            context.Uslugas.Remove(context.Uslugas.Where(x => x.IdUsluga.Equals(id)).First());
+            _context.WizytaUslugas.RemoveRange(_context.WizytaUslugas.Where(x => x.IdUsluga.Equals(id)).ToList());
+            _context.Uslugas.Remove(_context.Uslugas.Where(x => x.IdUsluga.Equals(id)).First());
 
-            int result = await context.SaveChangesAsync(cancellationToken);
-            cache.Remove();
+            int result = await _context.SaveChangesAsync(cancellationToken);
+            _cache.Remove();
 
             return result;
         }

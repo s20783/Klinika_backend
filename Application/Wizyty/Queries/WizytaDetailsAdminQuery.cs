@@ -15,28 +15,28 @@ namespace Application.Wizyty.Queries
 
     public class WizytaDetailsAdminQueryHandle : IRequestHandler<WizytaDetailsAdminQuery, GetWizytaDetailsAdminResponse>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly IWizytaRepository wizytaRepository;
-        public WizytaDetailsAdminQueryHandle(IKlinikaContext klinikaContext, IHash _hash, IWizytaRepository wizyta)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IWizyta _wizyta;
+        public WizytaDetailsAdminQueryHandle(IKlinikaContext klinikaContext, IHash hash, IWizyta wizyta)
         {
-            context = klinikaContext;
-            hash = _hash;
-            wizytaRepository = wizyta;
+            _context = klinikaContext;
+            _hash = hash;
+            _wizyta = wizyta;
         }
 
         public async Task<GetWizytaDetailsAdminResponse> Handle(WizytaDetailsAdminQuery req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_wizyta);
-            var harmonograms = context.Harmonograms.Where(x => x.IdWizyta.Equals(id)).ToList();
+            int id = _hash.Decode(req.ID_wizyta);
+            var harmonograms = _context.Harmonograms.Where(x => x.IdWizyta.Equals(id)).ToList();
 
             if (harmonograms.Any())
             {
-                (DateTime rozpoczecie, DateTime zakonczenie) = wizytaRepository.GetWizytaDates(harmonograms);
+                (DateTime rozpoczecie, DateTime zakonczenie) = _wizyta.GetWizytaDates(harmonograms);
 
-                return (from x in context.Wizyta
-                        join k in context.Osobas on x.IdOsoba equals k.IdOsoba
-                        join d in context.Pacjents on x.IdPacjent equals d.IdPacjent into pacjent
+                return (from x in _context.Wizyta
+                        join k in _context.Osobas on x.IdOsoba equals k.IdOsoba
+                        join d in _context.Pacjents on x.IdPacjent equals d.IdPacjent into pacjent
                         from p in pacjent.DefaultIfEmpty()
                         where x.IdWizyta == id
                         select new GetWizytaDetailsAdminResponse()
@@ -49,18 +49,18 @@ namespace Application.Wizyty.Queries
                             Opis = x.Opis,
                             NotatkaKlient = x.NotatkaKlient,
                             Cena = (decimal)(x.CenaZnizka != null ? x.CenaZnizka : x.Cena),
-                            Weterynarz = context.Osobas.Where(i => i.IdOsoba.Equals(harmonograms.First().WeterynarzIdOsoba)).Select(i => i.Imie + " " + i.Nazwisko).First(),
-                            IdWeterynarz = hash.Encode(harmonograms.First().WeterynarzIdOsoba),
-                            IdPacjent = x.IdPacjent != null ? hash.Encode(p.IdPacjent) : null,
+                            Weterynarz = _context.Osobas.Where(i => i.IdOsoba.Equals(harmonograms.First().WeterynarzIdOsoba)).Select(i => i.Imie + " " + i.Nazwisko).First(),
+                            IdWeterynarz = _hash.Encode(harmonograms.First().WeterynarzIdOsoba),
+                            IdPacjent = x.IdPacjent != null ? _hash.Encode(p.IdPacjent) : null,
                             Pacjent = x.IdPacjent != null ? p.Nazwa : null,
-                            IdKlient = x.IdOsoba != null ? hash.Encode(k.IdOsoba) : null,
+                            IdKlient = x.IdOsoba != null ? _hash.Encode(k.IdOsoba) : null,
                             Klient = k.Imie + " " + k.Nazwisko
                         }).FirstOrDefault();
             }
 
-            return (from x in context.Wizyta
-                    join k in context.Osobas on x.IdOsoba equals k.IdOsoba
-                    join d in context.Pacjents on x.IdPacjent equals d.IdPacjent into pacjent
+            return (from x in _context.Wizyta
+                    join k in _context.Osobas on x.IdOsoba equals k.IdOsoba
+                    join d in _context.Pacjents on x.IdPacjent equals d.IdPacjent into pacjent
                     from p in pacjent.DefaultIfEmpty()
                     where x.IdWizyta == id
                     select new GetWizytaDetailsAdminResponse()
@@ -73,9 +73,9 @@ namespace Application.Wizyty.Queries
                         Opis = x.Opis,
                         NotatkaKlient = x.NotatkaKlient,
                         Cena = (decimal)(x.CenaZnizka != null ? x.CenaZnizka : x.Cena),
-                        IdPacjent = x.IdPacjent != null ? hash.Encode(p.IdPacjent) : null,
+                        IdPacjent = x.IdPacjent != null ? _hash.Encode(p.IdPacjent) : null,
                         Pacjent = x.IdPacjent != null ? p.Nazwa : null,
-                        IdKlient = x.IdOsoba != null ? hash.Encode(k.IdOsoba) : null,
+                        IdKlient = x.IdOsoba != null ? _hash.Encode(k.IdOsoba) : null,
                         Klient = k.Imie + " " + k.Nazwisko
                     }).FirstOrDefault();
         }

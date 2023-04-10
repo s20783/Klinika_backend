@@ -1,6 +1,8 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,30 +19,27 @@ namespace Application.Uslugi.Queries
 
     public class UslugaPacjentListQueryHandler : IRequestHandler<UslugaPacjentListQuery, List<GetUslugaPacjentResponse>>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public UslugaPacjentListQueryHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IMapper _mapper;
+        public UslugaPacjentListQueryHandler(IKlinikaContext klinikaContext, IHash hash, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
+            _mapper = mapper;
         }
 
         public async Task<List<GetUslugaPacjentResponse>> Handle(UslugaPacjentListQuery req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_pacjent);
+            int id = _hash.Decode(req.ID_pacjent);
 
-            return (from x in context.WizytaUslugas
-                    join y in context.Uslugas on x.IdUsluga equals y.IdUsluga
-                    join w in context.Wizyta on x.IdWizyta equals w.IdWizyta
-                    where w.IdPacjent == id
-                    select new GetUslugaPacjentResponse()
-                    {
-                        ID_Usluga = hash.Encode(x.IdUsluga),
-                        ID_wizyta = hash.Encode(w.IdWizyta),
-                        NazwaUslugi = y.NazwaUslugi,
-                        Opis = y.Opis,
-                        Data = w.Harmonograms.Min(x => x.DataRozpoczecia)
-                    }).ToList();
+            return _mapper.Map<List<GetUslugaPacjentResponse>>(await _context.WizytaUslugas
+                .Include(x => x.IdUslugaNavigation)
+                .Include(x => x.IdWizytaNavigation)
+                .ThenInclude(x => x.Harmonograms)
+                .Where(x => x.IdWizytaNavigation.IdPacjent == id)
+                .ToListAsync(cancellationToken)
+                );
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,26 +18,26 @@ namespace Application.Znizki.Queries
 
     public class ZnizkaDetailsQueryHandler : IRequestHandler<ZnizkaDetailsQuery, GetZnizkaResponse>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public ZnizkaDetailsQueryHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public ZnizkaDetailsQueryHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<GetZnizkaResponse> Handle(ZnizkaDetailsQuery req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_znizka);
+            int id = _hash.Decode(req.ID_znizka);
 
-            return (from x in context.Znizkas
+            return await (from x in _context.Znizkas
                     where x.IdZnizka == id
                     select new GetZnizkaResponse()
                     {
-                        ID_Znizka = hash.Encode(x.IdZnizka),
+                        ID_Znizka = _hash.Encode(x.IdZnizka),
                         NazwaZnizki = x.NazwaZnizki,
                         ProcentZnizki = x.ProcentZnizki
-                    }).First();
+                    }).FirstOrDefaultAsync(cancellationToken);
         }
     }
 }

@@ -20,12 +20,12 @@ namespace Application.Szczepionki.Commands
 
     public class CreateSzczepionkaCommandHandler : IRequestHandler<CreateSzczepionkaCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public CreateSzczepionkaCommandHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public CreateSzczepionkaCommandHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(CreateSzczepionkaCommand req, CancellationToken cancellationToken)
@@ -34,18 +34,18 @@ namespace Application.Szczepionki.Commands
             {
                 try
                 {
-                    var lek = context.Leks.Add(new Lek
+                    var lek = _context.Leks.Add(new Lek
                     {
                         Nazwa = req.request.Nazwa,
                         JednostkaMiary = GlobalValues.SZCZEPIONKA_JEDNOSTKA,
                         Producent = req.request.Producent
                     });
 
-                    await context.SaveChangesAsync(cancellationToken);
+                    await _context.SaveChangesAsync(cancellationToken);
 
                     var id = lek != null ? lek.Entity.IdLek : 0;
 
-                    context.Szczepionkas.Add(new Szczepionka
+                    _context.Szczepionkas.Add(new Szczepionka
                     {
                         IdLek = id,
                         Zastosowanie = req.request.Zastosowanie,
@@ -54,7 +54,7 @@ namespace Application.Szczepionki.Commands
                     });
 
 
-                    await context.SaveChangesAsync(cancellationToken);
+                    await _context.SaveChangesAsync(cancellationToken);
                     transaction.Complete();
                 }
                 catch (Exception)

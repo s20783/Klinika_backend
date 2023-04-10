@@ -1,7 +1,9 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using AutoMapper;
 using Domain;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using ServiceLayer.DTO.Responses;
 using System;
 using System.Collections.Generic;
@@ -18,34 +20,31 @@ namespace Application.Specjalizacje.Queries
         public int Page { get; set; } = 1;
     }
 
-    public class SpecjalizacjaListQueryHandle : IRequestHandler<SpecjalizacjaListQuery, PaginatedResponse<GetSpecjalizacjaResponse>>
+    public class SpecjalizacjaListQueryHandler : IRequestHandler<SpecjalizacjaListQuery, PaginatedResponse<GetSpecjalizacjaResponse>>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly ICache<GetSpecjalizacjaResponse> cache;
-        public SpecjalizacjaListQueryHandle(IKlinikaContext klinikaContext, IHash _hash, ICache<GetSpecjalizacjaResponse> _cache)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly ICache<GetSpecjalizacjaResponse> _cache;
+        private readonly IMapper _mapper;
+        public SpecjalizacjaListQueryHandler(IKlinikaContext klinikaContext, IHash hash, ICache<GetSpecjalizacjaResponse> cache, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
-            cache = _cache;
+            _context = klinikaContext;
+            _hash = hash;
+            _cache = cache;
+            _mapper = mapper;
         }
 
         public async Task<PaginatedResponse<GetSpecjalizacjaResponse>> Handle(SpecjalizacjaListQuery req, CancellationToken cancellationToken)
         {
-            List<GetSpecjalizacjaResponse> data = cache.GetFromCache();
+            List<GetSpecjalizacjaResponse> data = _cache.GetFromCache();
 
             if (data is null)
             {
-                data = (from x in context.Specjalizacjas
-                        orderby x.Nazwa
-                        select new GetSpecjalizacjaResponse()
-                        {
-                            IdSpecjalizacja = hash.Encode(x.IdSpecjalizacja),
-                            Nazwa = x.Nazwa,
-                            Opis = x.Opis
-                        }).AsParallel().WithCancellation(cancellationToken).ToList();
+                data = _mapper.Map<List<GetSpecjalizacjaResponse>>(await _context.Specjalizacjas
+                    .ToListAsync(cancellationToken)
+                    );
 
-                cache.AddToCache(data);
+                _cache.AddToCache(data);
             }
 
             var results = data
@@ -54,7 +53,8 @@ namespace Application.Specjalizacje.Queries
                 x.Nazwa.ToLower().Contains(req.SearchWord.ToLower()) ||
                 x.Opis.ToLower().Contains(req.SearchWord.ToLower())
                 )
-                .OrderBy(x => x.Nazwa);
+                .OrderBy(x => x.Nazwa)
+                .ThenBy(x => x.Opis);
 
             return new PaginatedResponse<GetSpecjalizacjaResponse>
             {

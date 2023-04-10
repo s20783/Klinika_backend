@@ -16,41 +16,29 @@ namespace Application.Recepty.Commands
     {
         public string ID_wizyta { get; set; }
         public string Zalecenia { get; set; }
-        //public List<ReceptaLekRequest2> Leki { get; set; }
     }
 
     public class CreateReceptaCommandHandler : IRequestHandler<CreateReceptaCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public CreateReceptaCommandHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public CreateReceptaCommandHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(CreateReceptaCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_wizyta);
+            int id = _hash.Decode(req.ID_wizyta);
 
-            context.Recepta.Add(new Receptum
+            _context.Recepta.Add(new Receptum
             {
                 IdWizyta = id,
                 Zalecenia = req.Zalecenia
             });
 
-
-            /*foreach (var i in req.Leki)
-            {
-                context.ReceptaLeks.Add(new ReceptaLek
-                {
-                    IdWizyta = id,
-                    IdLek = hash.Decode(i.ID_Lek),
-                    Ilosc = i.Ilosc,
-                });
-            }*/
-
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

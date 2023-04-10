@@ -16,25 +16,25 @@ namespace Application.Urlopy.Commands
 
     public class DeleteUrlopCommandHandler : IRequestHandler<DeleteUrlopCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly IHarmonogramRepository harmonogramService;
-        public DeleteUrlopCommandHandler(IKlinikaContext klinikaContext, IHash _hash, IHarmonogramRepository harmonogramRepository)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IHarmonogram _harmonogramService;
+        public DeleteUrlopCommandHandler(IKlinikaContext klinikaContext, IHash hash, IHarmonogram harmonogram)
         {
-            context = klinikaContext;
-            hash = _hash;
-            harmonogramService = harmonogramRepository;
+            _context = klinikaContext;
+            _hash = hash;
+            _harmonogramService = harmonogram;
         }
 
         public async Task<int> Handle(DeleteUrlopCommand req, CancellationToken cancellationToken)
         {
-            int urlopID = hash.Decode(req.ID_urlop);
+            int urlopID = _hash.Decode(req.ID_urlop);
 
-            var urlop = context.Urlops.Where(x => x.IdUrlop.Equals(urlopID)).First();
+            var urlop = _context.Urlops.Where(x => x.IdUrlop.Equals(urlopID)).First();
             //harmonogramService.CreateWeterynarzHarmonograms(context, urlop.Dzien, urlop.IdOsoba);
-            context.Urlops.Remove(urlop);
+            _context.Urlops.Remove(urlop);
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

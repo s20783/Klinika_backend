@@ -17,20 +17,20 @@ namespace Application.WizytaChoroby.Commands
 
     public class RemoveWizytaChorobaCommandHandler : IRequestHandler<RemoveWizytaChorobaCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public RemoveWizytaChorobaCommandHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public RemoveWizytaChorobaCommandHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(RemoveWizytaChorobaCommand req, CancellationToken cancellationToken)
         {
-            (int id1, int id2) = hash.Decode(req.ID_wizyta, req.ID_choroba);
+            (int id1, int id2) = _hash.Decode(req.ID_wizyta, req.ID_choroba);
 
-            context.WizytaChorobas.Remove(context.WizytaChorobas.First(x => x.IdWizyta == id1 && x.IdChoroba == id2));
-            return await context.SaveChangesAsync(cancellationToken);
+            _context.WizytaChorobas.Remove(_context.WizytaChorobas.First(x => x.IdWizyta == id1 && x.IdChoroba == id2));
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

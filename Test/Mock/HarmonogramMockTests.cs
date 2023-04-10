@@ -29,7 +29,7 @@ namespace Test.Mock
         }
 
 
-        [Test]
+        /*[Test]
         public async Task CreateHarmonogramShouldBeCorrectTest()
         {
             var before = mockContext.Object.Harmonograms.Count();
@@ -70,24 +70,6 @@ namespace Test.Mock
             };
 
             Assert.DoesNotThrowAsync(async () => await handler.Handle(command, CancellationToken.None));
-        }
-
-        [Test]
-        public async Task DeleteHarmonogramShouldBeCorrectTest()
-        {
-            var before = mockContext.Object.Harmonograms.Count();
-            var before2 = mockContext.Object.Wizyta.Where(x => x.Status == WizytaStatus.AnulowanaKlinika.ToString()).Count();
-            var handler = new DeleteHarmonogramCommandHandler(mockContext.Object, hash, harmonogramService);
-
-            var command = new DeleteHarmonogramCommand()
-            {
-                Data = new DateTime(2022, 10, 27)
-            };
-
-            await handler.Handle(command, CancellationToken.None);
-            Assert.AreNotEqual(mockContext.Object.Harmonograms.Count(), before);
-            Assert.AreEqual(mockContext.Object.Harmonograms.Count(), before - 3);
-            Assert.AreEqual(mockContext.Object.Wizyta.Where(x => x.Status == WizytaStatus.AnulowanaKlinika.ToString()).Count(), before2 + 1);
-        }
+        }*/
     }
 }

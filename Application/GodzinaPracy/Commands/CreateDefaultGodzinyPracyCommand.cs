@@ -19,21 +19,21 @@ namespace Application.GodzinaPracy.Commands
 
     public class CreateDefaultGodzinyPracyCommandHandle : IRequestHandler<CreateDefaultGodzinyPracyCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public CreateDefaultGodzinyPracyCommandHandle(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public CreateDefaultGodzinyPracyCommandHandle(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(CreateDefaultGodzinyPracyCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_osoba);
+            int id = _hash.Decode(req.ID_osoba);
 
             for (int i = 1; i <= GlobalValues.DNI_PRACY; i++)
             {
-                context.GodzinyPracies.Add(new GodzinyPracy
+                _context.GodzinyPracies.Add(new GodzinyPracy
                 {
                     IdOsoba = id,
                     DzienTygodnia = i,
@@ -42,7 +42,7 @@ namespace Application.GodzinaPracy.Commands
                 });
             }
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

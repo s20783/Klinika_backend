@@ -19,19 +19,19 @@ namespace Application.Konto.Commands
 
     public class RefreshCommandHandler : IRequestHandler<RefreshCommand, object>
     {
-        private readonly IKlinikaContext context;
-        private readonly ITokenRepository tokenRepository;
-        private readonly IHash hash;
-        public RefreshCommandHandler(IKlinikaContext klinikaContext, ITokenRepository repository, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IToken _tokenRepository;
+        private readonly IHash _hash;
+        public RefreshCommandHandler(IKlinikaContext klinikaContext, IToken repository, IHash hash)
         {
-            context = klinikaContext;
-            tokenRepository = repository;
-            hash = _hash;
+            _context = klinikaContext;
+            _tokenRepository = repository;
+            _hash = hash;
         }
 
         public async Task<object> Handle(RefreshCommand req, CancellationToken cancellationToken)
         {
-            var user = context.Osobas.SingleOrDefault(x => x.RefreshToken.Equals(req.request.RefreshToken));
+            var user = _context.Osobas.SingleOrDefault(x => x.RefreshToken.Equals(req.request.RefreshToken));
             if (user == null)
             {
                 throw new NotFoundException("Nie znaleziono Refresh Token");
@@ -44,7 +44,7 @@ namespace Application.Konto.Commands
 
             List<Claim> userclaim = new List<Claim>
             {
-                new Claim("idUser", hash.Encode(user.IdOsoba)),
+                new Claim("idUser", _hash.Encode(user.IdOsoba)),
                 new Claim("login", user.NazwaUzytkownika)
             };
 
@@ -61,7 +61,7 @@ namespace Application.Konto.Commands
                 userclaim.Add(new Claim(ClaimTypes.Role, "Klient"));
             }
 
-            var token = tokenRepository.GetJWT(userclaim);
+            var token = _tokenRepository.GetJWT(userclaim);
 
             return new 
             { 

@@ -18,26 +18,26 @@ namespace Application.ChorobaLeki.Commands
 
     public class AddChorobaLekCommandHandler : IRequestHandler<AddChorobaLekCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public AddChorobaLekCommandHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public AddChorobaLekCommandHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(AddChorobaLekCommand req, CancellationToken cancellationToken)
         {
-            int lekID = hash.Decode(req.ID_lek);
-            int chorobaID = hash.Decode(req.ID_choroba);
+            int lekID = _hash.Decode(req.ID_lek);
+            int chorobaID = _hash.Decode(req.ID_choroba);
 
-            context.ChorobaLeks.Add(new ChorobaLek
+            _context.ChorobaLeks.Add(new ChorobaLek
             {
                 IdChoroba = chorobaID,
                 IdLek = lekID
             });
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

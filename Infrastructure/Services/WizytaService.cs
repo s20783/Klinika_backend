@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Infrastructure.Services
 {
-    public class WizytaService : IWizytaRepository
+    public class WizytaService : IWizyta
     {
         public bool IsWizytaAbleToCreate(List<Wizytum> wizytaList)
         {

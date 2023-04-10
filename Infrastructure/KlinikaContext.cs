@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
-namespace Infrastructure.Models
+namespace Infrastructure
 {
     public partial class KlinikaContext : DbContext, IKlinikaContext
     {

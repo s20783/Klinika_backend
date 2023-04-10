@@ -1,7 +1,9 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using AutoMapper;
 using Domain;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using ServiceLayer.DTO.Responses;
 using System;
 using System.Collections.Generic;
@@ -19,34 +21,30 @@ namespace Application.Uslugi.Queries
 
     public class UslugaListQueryHandler : IRequestHandler<UslugaListQuery, PaginatedResponse<GetUslugaResponse>>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly ICache<GetUslugaResponse> cache;
-        public UslugaListQueryHandler(IKlinikaContext klinikaContext, IHash _hash, ICache<GetUslugaResponse> _cache)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly ICache<GetUslugaResponse> _cache;
+        private readonly IMapper _mapper;
+        public UslugaListQueryHandler(IKlinikaContext klinikaContext, IHash hash, ICache<GetUslugaResponse> cache, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
-            cache = _cache;
+            _context = klinikaContext;
+            _hash = hash;
+            _cache = cache;
+            _mapper = mapper;
         }
 
         public async Task<PaginatedResponse<GetUslugaResponse>> Handle(UslugaListQuery req, CancellationToken cancellationToken)
         {
-            List<GetUslugaResponse> data = cache.GetFromCache();
+            List<GetUslugaResponse> data = _cache.GetFromCache();
 
             if (data is null)
             {
-                data = (from x in context.Uslugas
-                        select new GetUslugaResponse()
-                        {
-                            ID_Usluga = hash.Encode(x.IdUsluga),
-                            NazwaUslugi = x.NazwaUslugi,
-                            Opis = x.Opis,
-                            Cena = x.Cena,
-                            Narkoza = x.Narkoza,
-                            Dolegliwosc = x.Dolegliwosc
-                        }).ToList();
+                data = _mapper.Map<List<GetUslugaResponse>>(_context.Uslugas
+                    .OrderBy(x => x.NazwaUslugi)
+                    .ToListAsync(cancellationToken)
+                    );
 
-                cache.AddToCache(data);
+                _cache.AddToCache(data);
             }
 
             var results = data

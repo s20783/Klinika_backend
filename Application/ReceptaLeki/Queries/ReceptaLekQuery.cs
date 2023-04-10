@@ -1,5 +1,7 @@
 ﻿using Application.Interfaces;
+using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,32 +16,28 @@ namespace Application.ReceptaLeki.Queries
         public string ID_Recepta { get; set; }
     }
 
-    public class SpecjalizacjaDetailsQueryHandle : IRequestHandler<ReceptaLekQuery, List<GetReceptaLekResponse>>
+    public class SpecjalizacjaDetailsQueryHandler : IRequestHandler<ReceptaLekQuery, List<GetReceptaLekResponse>>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public SpecjalizacjaDetailsQueryHandle(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IMapper _mapper;
+        public SpecjalizacjaDetailsQueryHandler(IKlinikaContext klinikaContext, IHash hash, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
+            _mapper = mapper;
         }
 
         public async Task<List<GetReceptaLekResponse>> Handle(ReceptaLekQuery req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_Recepta);
+            int id = _hash.Decode(req.ID_Recepta);
 
-            return (from x in context.ReceptaLeks
-                    join y in context.Leks on x.IdLek equals y.IdLek
-                    where x.IdWizyta == id
-                    orderby y.Nazwa
-                    select new GetReceptaLekResponse()
-                    {
-                        ID_Lek = hash.Encode(x.IdLek),
-                        Nazwa = y.Nazwa,
-                        JednostkaMiary = y.JednostkaMiary,
-                        Producent = y.Producent,
-                        Ilosc = x.Ilosc
-                    }).ToList();
+            return _mapper.Map<List<GetReceptaLekResponse>>(await _context.ReceptaLeks
+                .Include(x => x.IdLekNavigation)
+                .Where(x => x.IdWizyta == id)
+                .OrderBy(x => x.IdLekNavigation.Nazwa)
+                .ToListAsync(cancellationToken)
+                );
         }
     }
 }

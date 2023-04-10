@@ -18,20 +18,20 @@ namespace Application.Szczepienia.Commands
 
     public class CreateSzczepienieCommandHandler : IRequestHandler<CreateSzczepienieCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public CreateSzczepienieCommandHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public CreateSzczepienieCommandHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(CreateSzczepienieCommand req, CancellationToken cancellationToken)
         {
-            int idLek = hash.Decode(req.request.IdLek);
-            int idPacjent = hash.Decode(req.request.IdPacjent);
+            int idLek = _hash.Decode(req.request.IdLek);
+            int idPacjent = _hash.Decode(req.request.IdPacjent);
 
-            context.Szczepienies.Add(new Szczepienie
+            _context.Szczepienies.Add(new Szczepienie
             {
                 IdLek = idLek,
                 IdPacjent = idPacjent,
@@ -39,7 +39,7 @@ namespace Application.Szczepienia.Commands
                 Dawka = req.request.Dawka
             });
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

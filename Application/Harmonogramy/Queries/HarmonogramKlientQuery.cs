@@ -16,25 +16,25 @@ namespace Application.Harmonogramy.Queries
 
     public class HarmonogramKlientQueryHandle : IRequestHandler<HarmonogramKlientQuery, List<GetHarmonogramKlientResponse>>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public HarmonogramKlientQueryHandle(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public HarmonogramKlientQueryHandle(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<List<GetHarmonogramKlientResponse>> Handle(HarmonogramKlientQuery req, CancellationToken cancellationToken)
         {
             var results =
-                (from x in context.Harmonograms
-                 join w in context.Osobas on x.WeterynarzIdOsoba equals w.IdOsoba
+                (from x in _context.Harmonograms
+                 join w in _context.Osobas on x.WeterynarzIdOsoba equals w.IdOsoba
                  where x.DataRozpoczecia.Date == req.Date && x.IdWizyta == null
                  orderby x.DataRozpoczecia
                  select new GetHarmonogramKlientResponse()
                  {
-                     IdHarmonogram = hash.Encode(x.IdHarmonogram),
-                     IdWeterynarz = hash.Encode(x.WeterynarzIdOsoba),
+                     IdHarmonogram = _hash.Encode(x.IdHarmonogram),
+                     IdWeterynarz = _hash.Encode(x.WeterynarzIdOsoba),
                      Data = x.DataRozpoczecia,
                      Dzien = (int)x.DataRozpoczecia.DayOfWeek,
                      Weterynarz = w.Imie + " " + w.Nazwisko

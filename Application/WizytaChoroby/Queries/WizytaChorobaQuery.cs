@@ -2,7 +2,9 @@
 using Application.Interfaces;
 using Application.ReceptaLeki.Queries;
 using Application.Recepty.Queries;
+using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,28 +21,25 @@ namespace Application.WizytaChoroby.Queries
 
     public class WizytaChorobaQueryHandler : IRequestHandler<WizytaChorobaQuery, List<GetChorobaResponse>>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public WizytaChorobaQueryHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IMapper _mapper;
+        public WizytaChorobaQueryHandler(IKlinikaContext klinikaContext, IHash hash, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
+            _mapper = mapper;
         }
 
         public async Task<List<GetChorobaResponse>> Handle(WizytaChorobaQuery req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_wizyta);
+            int id = _hash.Decode(req.ID_wizyta);
 
-            return (from x in context.WizytaChorobas
-                    join y in context.Chorobas on x.IdChoroba equals y.IdChoroba
-                    where x.IdWizyta == id
-                    select new GetChorobaResponse()
-                    {
-                        ID_Choroba = hash.Encode(x.IdChoroba),
-                        Nazwa = y.Nazwa,
-                        NazwaLacinska = y.NazwaLacinska,
-                        Opis = y.Opis
-                    }).ToList();
+            return _mapper.Map<List<GetChorobaResponse>>(await _context.WizytaChorobas
+                .Include(x => x.IdChorobaNavigation)
+                .Where(x => x.IdWizyta == id)
+                .ToListAsync(cancellationToken)
+                );
         }
     }
 }

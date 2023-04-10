@@ -1,6 +1,8 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,25 +16,23 @@ namespace Application.LekiWMagazynie.Queries
 
     public class GetStanLekuQueryHandle : IRequestHandler<StanLekuQuery, GetStanLekuResponse>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public GetStanLekuQueryHandle(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IMapper _mapper;
+        public GetStanLekuQueryHandle(IKlinikaContext klinikaContext, IHash hash, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
+            _mapper = mapper;
         }
 
         public async Task<GetStanLekuResponse> Handle(StanLekuQuery req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_stan_leku);
+            int id = _hash.Decode(req.ID_stan_leku);
 
-            return (from p in context.LekWMagazynies
-                    where p.IdStanLeku == id
-                    select new GetStanLekuResponse()
-                    {
-                        Ilosc = p.Ilosc,
-                        DataWaznosci = p.DataWaznosci
-                    }).FirstOrDefault();
+            return _mapper.Map<GetStanLekuResponse>(await _context.LekWMagazynies
+                .Where(x => x.IdStanLeku == id)
+                .FirstOrDefaultAsync(cancellationToken));
         }
     }
 }

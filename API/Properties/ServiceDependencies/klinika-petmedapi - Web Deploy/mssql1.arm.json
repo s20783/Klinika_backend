@@ -4,7 +4,7 @@
   "parameters": {
     "resourceGroupName": {
       "type": "string",
-      "defaultValue": "MojaGrupa1",
+      "defaultValue": "GrupaPJ",
       "metadata": {
         "_parameterType": "resourceGroup",
         "description": "Nazwa grupy zasobów dla zasobu. Zaleca się umieszczanie zasobów w tej samej grupie zasobów, aby ułatwić śledzenie."
@@ -51,23 +51,23 @@
             {
               "kind": "v12.0",
               "location": "[parameters('resourceLocation')]",
-              "name": "pjdb-20783-20826",
+              "name": "klinikaserver",
               "type": "Microsoft.Sql/servers",
               "apiVersion": "2017-10-01-preview"
             },
             {
               "sku": {
-                "name": "Basic",
-                "tier": "Basic",
+                "name": "Free",
+                "tier": "Free",
                 "capacity": 5
               },
               "kind": "v12.0,user",
               "location": "[parameters('resourceLocation')]",
-              "name": "pjdb-20783-20826/Klinika",
+              "name": "klinikaserver/Klinika",
               "type": "Microsoft.Sql/servers/databases",
               "apiVersion": "2017-10-01-preview",
               "dependsOn": [
-                "pjdb-20783-20826"
+                "klinikaserver"
               ]
             }
           ]

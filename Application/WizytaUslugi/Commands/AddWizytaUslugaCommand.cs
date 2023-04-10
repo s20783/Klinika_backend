@@ -23,33 +23,33 @@ namespace Application.WizytaUslugi.Commands
 
     public class AddWizytaUslugaCommandHandler : IRequestHandler<AddWizytaUslugaCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly IWizytaRepository wizytaRepository;
-        public AddWizytaUslugaCommandHandler(IKlinikaContext klinikaContext, IHash _hash, IWizytaRepository _wizytaRepository)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IWizyta _wizyta;
+        public AddWizytaUslugaCommandHandler(IKlinikaContext klinikaContext, IHash hash, IWizyta wizyta)
         {
-            context = klinikaContext;
-            hash = _hash;
-            wizytaRepository = _wizytaRepository;
+            _context = klinikaContext;
+            _hash = hash;
+            _wizyta = wizyta;
         }
 
         public async Task<int> Handle(AddWizytaUslugaCommand req, CancellationToken cancellationToken)
         {
-            (int id1, int id2) = hash.Decode(req.ID_wizyta, req.ID_usluga);
+            (int id1, int id2) = _hash.Decode(req.ID_wizyta, req.ID_usluga);
 
             using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 try
                 {
-                    context.WizytaUslugas.Add(new WizytaUsluga
+                    _context.WizytaUslugas.Add(new WizytaUsluga
                     {
                         IdWizyta = id1,
                         IdUsluga = id2
                     });
 
-                    await context.SaveChangesAsync(cancellationToken);
+                    await _context.SaveChangesAsync(cancellationToken);
 
-                    var wizyta = context.Wizyta.Where(x => x.IdWizyta.Equals(id1)).Include(x => x.WizytaUslugas).ThenInclude(y => y.IdUslugaNavigation).First();
+                    var wizyta = _context.Wizyta.Where(x => x.IdWizyta.Equals(id1)).Include(x => x.WizytaUslugas).ThenInclude(y => y.IdUslugaNavigation).First();
                     
                     if(wizyta.Status != WizytaStatus.Zaplanowana.ToString() && wizyta.Status != WizytaStatus.Zrealizowana.ToString())
                     {
@@ -57,9 +57,9 @@ namespace Application.WizytaUslugi.Commands
                     }
                     
                     var uslugas = wizyta.WizytaUslugas.Select(x => x.IdUslugaNavigation).ToList();
-                    wizyta.Cena = wizytaRepository.GetWizytaCena(uslugas);
+                    wizyta.Cena = _wizyta.GetWizytaCena(uslugas);
 
-                    await context.SaveChangesAsync(cancellationToken);
+                    await _context.SaveChangesAsync(cancellationToken);
                     transaction.Complete();
                 }
                 catch (Exception e)

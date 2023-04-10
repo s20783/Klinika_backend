@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Application.Interfaces
 {
-    public interface ITokenRepository
+    public interface IToken
     {
         string GetJWT(List<Claim> claims);
     }

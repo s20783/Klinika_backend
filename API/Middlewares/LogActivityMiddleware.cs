@@ -32,11 +32,6 @@ namespace PRO_API.Middlewares
                     userInfo += "ID = " + rolesClaims[0].Value + ", Rola: " + rolesClaims[1].Value;
                 }
 
-
-                /*var endpoint = httpContext.GetEndpoint();
-                if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() is not object)
-                {*/
-
                 using (StreamWriter fileStream = new StreamWriter(new FileStream(@"api.log", FileMode.Append)))
                 {
                     string requestPath = httpContext.Request.Path;
@@ -47,7 +42,6 @@ namespace PRO_API.Middlewares
 
                     await fileStream.WriteAsync(outputInfo);
                 }
-                //}
             }
         }
     }

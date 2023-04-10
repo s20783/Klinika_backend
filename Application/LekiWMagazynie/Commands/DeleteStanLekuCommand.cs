@@ -17,20 +17,20 @@ namespace Application.LekiWMagazynie.Commands
 
     public class DeleteStanLekuCommandHandler : IRequestHandler<DeleteStanLekuCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public DeleteStanLekuCommandHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public DeleteStanLekuCommandHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(DeleteStanLekuCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_stan_leku);
+            int id = _hash.Decode(req.ID_stan_leku);
 
-            context.LekWMagazynies.Remove(context.LekWMagazynies.Where(x => x.IdStanLeku == id).First());
-            return await context.SaveChangesAsync(cancellationToken);
+            _context.LekWMagazynies.Remove(_context.LekWMagazynies.Where(x => x.IdStanLeku == id).First());
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

@@ -1,10 +1,9 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using AutoMapper;
 using MediatR;
-using System;
-using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,33 +16,26 @@ namespace Application.Szczepienia.Queries
 
     public class SzczepienieDetailsQueryHandler : IRequestHandler<SzczepienieDetailsQuery, GetSzczepienieResponse>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public SzczepienieDetailsQueryHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IMapper _mapper;
+        public SzczepienieDetailsQueryHandler(IKlinikaContext klinikaContext, IHash hash, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
+            _mapper = mapper;
         }
 
         public async Task<GetSzczepienieResponse> Handle(SzczepienieDetailsQuery req, CancellationToken cancellationToken)
         { 
-            int id = hash.Decode(req.ID_szczepienie);
+            int id = _hash.Decode(req.ID_szczepienie);
 
-            return (from x in context.Szczepienies
-                    join y in context.Szczepionkas on x.IdLek equals y.IdLek
-                    join z in context.Leks on y.IdLek equals z.IdLek
-                    where x.IdSzczepienie == id
-                    orderby z.Nazwa
-                    select new GetSzczepienieResponse()
-                    {
-                        IdSzczepienie = req.ID_szczepienie,
-                        IdPacjent = hash.Encode(x.IdPacjent),
-                        IdLek = hash.Encode(x.IdLek),
-                        Nazwa = z.Nazwa,
-                        Data = x.Data,
-                        DataWaznosci = y.OkresWaznosci != null ? x.Data.AddTicks((long)y.OkresWaznosci) : null,
-                        Dawka = x.Dawka
-                    }).First();
+            return _mapper.Map<GetSzczepienieResponse>(await _context.Szczepienies
+                .Include(x => x.IdLekNavigation)
+                .ThenInclude(x => x.IdLekNavigation)
+                .Where(x => x.IdSzczepienie == id)
+                .FirstOrDefaultAsync(cancellationToken)
+                );     
         }
     }
 }

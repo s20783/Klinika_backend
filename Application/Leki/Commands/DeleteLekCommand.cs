@@ -13,30 +13,30 @@ namespace Application.Leki.Commands
 
     public class DeleteLekCommandHandler : IRequestHandler<DeleteLekCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public DeleteLekCommandHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public DeleteLekCommandHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(DeleteLekCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_lek);
+            int id = _hash.Decode(req.ID_lek);
 
-            context.LekWMagazynies.RemoveRange(context.LekWMagazynies.Where(x => x.IdLek.Equals(id)).ToList());
-            context.ChorobaLeks.RemoveRange(context.ChorobaLeks.Where(x => x.IdLek.Equals(id)).ToList());
-            context.WizytaLeks.RemoveRange(context.WizytaLeks.Where(x => x.IdLek.Equals(id)).ToList());
-            context.ReceptaLeks.RemoveRange(context.ReceptaLeks.Where(x => x.IdLek.Equals(id)).ToList());
+            _context.LekWMagazynies.RemoveRange(_context.LekWMagazynies.Where(x => x.IdLek.Equals(id)).ToList());
+            _context.ChorobaLeks.RemoveRange(_context.ChorobaLeks.Where(x => x.IdLek.Equals(id)).ToList());
+            _context.WizytaLeks.RemoveRange(_context.WizytaLeks.Where(x => x.IdLek.Equals(id)).ToList());
+            _context.ReceptaLeks.RemoveRange(_context.ReceptaLeks.Where(x => x.IdLek.Equals(id)).ToList());
 
-            if(context.Szczepionkas.Where(x => x.IdLek.Equals(id)).Any())
+            if(_context.Szczepionkas.Where(x => x.IdLek.Equals(id)).Any())
             {
-                context.Szczepionkas.Remove(context.Szczepionkas.Where(x => x.IdLek.Equals(id)).First());
+                _context.Szczepionkas.Remove(_context.Szczepionkas.Where(x => x.IdLek.Equals(id)).First());
             }
-            context.Leks.Remove(context.Leks.Where(x => x.IdLek.Equals(id)).First());
+            _context.Leks.Remove(_context.Leks.Where(x => x.IdLek.Equals(id)).First());
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

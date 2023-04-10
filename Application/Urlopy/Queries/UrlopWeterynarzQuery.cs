@@ -1,6 +1,8 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,31 +19,26 @@ namespace Application.Urlopy.Queries
 
     public class UrlopWeterynarzQueryHandler : IRequestHandler<UrlopWeterynarzQuery, List<GetUrlopResponse>>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public UrlopWeterynarzQueryHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IMapper _mapper;
+        public UrlopWeterynarzQueryHandler(IKlinikaContext klinikaContext, IHash hash, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
+            _mapper = mapper;
         }
 
         public async Task<List<GetUrlopResponse>> Handle(UrlopWeterynarzQuery req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_weterynarz);
+            int id = _hash.Decode(req.ID_weterynarz);
 
-            var results =
-                (from x in context.Urlops
-                 join y in context.Osobas on x.IdOsoba equals y.IdOsoba
-                 where x.IdOsoba == id
-                 select new GetUrlopResponse()
-                 {
-                     IdUrlop = hash.Encode(x.IdUrlop),
-                     ID_Weterynarz = req.ID_weterynarz,
-                     Weterynarz = y.Imie + " " + y.Nazwisko,
-                     Dzien = x.Dzien
-                 }).ToList();
-
-            return results;
+            return _mapper.Map<List<GetUrlopResponse>>(await _context.Urlops
+                .Include(x => x.IdOsobaNavigation)
+                .ThenInclude(x => x.IdOsobaNavigation)
+                .Where(x => x.IdOsoba == id)
+                .FirstOrDefaultAsync(cancellationToken)
+                 );
         }
     }
 }

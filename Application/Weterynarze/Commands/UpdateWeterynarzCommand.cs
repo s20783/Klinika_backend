@@ -15,24 +15,24 @@ namespace Application.Weterynarze.Commands
         public WeterynarzUpdateRequest request { get; set; }
     }
 
-    public class UpdateWeterynarzCommandHandle : IRequestHandler<UpdateWeterynarzCommand, int>
+    public class UpdateWeterynarzCommandHandler : IRequestHandler<UpdateWeterynarzCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly ICache<GetWeterynarzListResponse> cache;
-        public UpdateWeterynarzCommandHandle(IKlinikaContext klinikaContext, IHash _hash, ICache<GetWeterynarzListResponse> _cache)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly ICache<GetWeterynarzListResponse> _cache;
+        public UpdateWeterynarzCommandHandler(IKlinikaContext klinikaContext, IHash hash, ICache<GetWeterynarzListResponse> cache)
         {
-            context = klinikaContext;
-            hash = _hash;
-            cache = _cache;
+            _context = klinikaContext;
+            _hash = hash;
+            _cache = cache;
         }
 
         public async Task<int> Handle(UpdateWeterynarzCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_osoba);
+            int id = _hash.Decode(req.ID_osoba);
 
-            var konto = context.Osobas.Where(x => x.IdOsoba == id).First();
-            var weterynarz = context.Weterynarzs.Where(x => x.IdOsoba == id).First();
+            var konto = _context.Osobas.Where(x => x.IdOsoba == id).First();
+            var weterynarz = _context.Weterynarzs.Where(x => x.IdOsoba == id).First();
 
             konto.Imie = req.request.Imie;
             konto.Nazwisko = req.request.Nazwisko;
@@ -43,8 +43,8 @@ namespace Application.Weterynarze.Commands
             weterynarz.Pensja = req.request.Pensja;
             weterynarz.DataZatrudnienia = req.request.DataZatrudnienia.Date;
 
-            int result = await context.SaveChangesAsync(cancellationToken);
-            cache.Remove();
+            int result = await _context.SaveChangesAsync(cancellationToken);
+            _cache.Remove();
 
             return result;
         }

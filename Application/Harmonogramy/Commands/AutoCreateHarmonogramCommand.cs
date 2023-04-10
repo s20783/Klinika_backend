@@ -18,35 +18,38 @@ namespace Application.Harmonogramy.Commands
 
     public class AutoCreateHarmonogramCommandHandler : IRequestHandler<AutoCreateHarmonogramCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly IHarmonogramRepository harmonogramService;
-        public AutoCreateHarmonogramCommandHandler(IKlinikaContext klinikaContext, IHash _hash, IHarmonogramRepository harmonogramRepository)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IHarmonogram _harmonogramService;
+        public AutoCreateHarmonogramCommandHandler(IKlinikaContext klinikaContext, IHash hash, IHarmonogram harmonogramRepository)
         {
-            context = klinikaContext;
-            hash = _hash;
-            harmonogramService = harmonogramRepository;
+            _context = klinikaContext;
+            _hash = hash;
+            _harmonogramService = harmonogramRepository;
         }
 
         public async Task<int> Handle(AutoCreateHarmonogramCommand req, CancellationToken cancellationToken)
         {
-            var endOfCurrentHarmonograms = context.Harmonograms.Max(x => x.DataZakonczenia).Date;
-            if (endOfCurrentHarmonograms < DateTime.Now)
+            var endOfCurrentHarmonograms = DateTime.Now.Date;
+            if (_context.Harmonograms.Any())
             {
-                endOfCurrentHarmonograms = DateTime.Now.Date;
+                if (_context.Harmonograms.Max(x => x.DataZakonczenia.Date) > endOfCurrentHarmonograms)
+                {
+                    endOfCurrentHarmonograms = _context.Harmonograms.Max(x => x.DataZakonczenia.Date);
+                }
             }
 
-            var vets = context.Weterynarzs.ToList();
+            var vets = _context.Weterynarzs.ToList();
 
             for (int i = 1; i <= 7 + 7 - (int)endOfCurrentHarmonograms.DayOfWeek; i++)
             {
                 foreach (Weterynarz w in vets)
                 {
-                    harmonogramService.CreateWeterynarzHarmonograms(context, endOfCurrentHarmonograms.AddDays(i), w.IdOsoba);
+                    _harmonogramService.CreateWeterynarzHarmonograms(_context, endOfCurrentHarmonograms.AddDays(i), w.IdOsoba);
                 }
             }
 
-            return await context.SaveChangesAsync(cancellationToken);            
+            return await _context.SaveChangesAsync(cancellationToken);            
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,27 +19,25 @@ namespace Application.Choroby.Queries
 
     public class ChorobaDetailsQueryHandler : IRequestHandler<ChorobaDetailsQuery, GetChorobaResponse>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public ChorobaDetailsQueryHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IMapper _mapper;
+        public ChorobaDetailsQueryHandler(IKlinikaContext klinikaContext, IHash hash, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
+            _mapper = mapper;
         }
 
         public async Task<GetChorobaResponse> Handle(ChorobaDetailsQuery req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_Choroba);
+            int id = _hash.Decode(req.ID_Choroba);
 
-            return (from x in context.Chorobas
-                    where x.IdChoroba == id
-                    select new GetChorobaResponse()
-                    {
-                        ID_Choroba = req.ID_Choroba,
-                        Nazwa = x.Nazwa,
-                        NazwaLacinska = x.NazwaLacinska,
-                        Opis = x.Opis
-                    }).First();
+            return _mapper.Map<GetChorobaResponse>(await _context.Chorobas
+                    .OrderBy(x => x.Nazwa)
+                    .Where(x => x.IdChoroba == id)
+                    .FirstAsync(cancellationToken)
+                    );
         }
     }
 }

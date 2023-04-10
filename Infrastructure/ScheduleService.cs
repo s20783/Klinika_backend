@@ -16,8 +16,8 @@ namespace Infrastructure
         private readonly ILogger<ScheduleService> logger;
         private readonly IKlinikaContext context;
         private readonly IEmailSender emailSender;
-        private readonly IHarmonogramRepository harmonogram;
-        public ScheduleService(ILogger<ScheduleService> log, IKlinikaContext klinikaContext, IEmailSender sender, IHarmonogramRepository _harmonogram)
+        private readonly IHarmonogram harmonogram;
+        public ScheduleService(ILogger<ScheduleService> log, IKlinikaContext klinikaContext, IEmailSender sender, IHarmonogram _harmonogram)
         {
             logger = log;
             context = klinikaContext;
@@ -93,10 +93,13 @@ namespace Infrastructure
 
         public async Task CreateHarmonogramsBySystem()
         {
-            var endOfCurrentHarmonograms = context.Harmonograms.Max(x => x.DataZakonczenia).Date;
-            if(endOfCurrentHarmonograms < DateTime.Now)
+            var endOfCurrentHarmonograms = DateTime.Now.Date;
+            if (context.Harmonograms.Any())
             {
-                endOfCurrentHarmonograms = DateTime.Now.Date;
+                if(context.Harmonograms.Max(x => x.DataZakonczenia.Date) > endOfCurrentHarmonograms)
+                {
+                    endOfCurrentHarmonograms = context.Harmonograms.Max(x => x.DataZakonczenia.Date);
+                }
             }
 
             for (int i = 1; i <= 7; i++)

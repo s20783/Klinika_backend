@@ -25,6 +25,13 @@ namespace PRO_API.Controllers
             }, token));
         }
 
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAll(CancellationToken token)
+        {
+            return Ok(await Mediator.Send(new KlientListAllQuery(), token));
+        }
+
 
         [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpGet("{ID_osoba}")]
@@ -76,29 +83,6 @@ namespace PRO_API.Controllers
             {
                 return BadRequest(e.Message);
             }
-        }
-
-
-        [AuthorizeRoles(RolaEnum.Klient)]
-        [HttpDelete]
-        public async Task<IActionResult> DeleteKlient(CancellationToken token)
-        {
-            try
-            {
-                if (isKlient())
-                {
-                    await Mediator.Send(new DeleteKlientCommand
-                    {
-                        ID_osoba = GetUserId()
-                    }, token);
-                }
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-
-            return NoContent();
         }
 
         [AuthorizeRoles(RolaEnum.Admin)]

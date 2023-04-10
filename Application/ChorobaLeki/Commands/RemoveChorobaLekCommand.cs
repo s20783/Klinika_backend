@@ -17,23 +17,23 @@ namespace Application.ChorobaLeki.Commands
 
     public class RemoveChorobaLekCommandHandler : IRequestHandler<RemoveChorobaLekCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public RemoveChorobaLekCommandHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public RemoveChorobaLekCommandHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(RemoveChorobaLekCommand req, CancellationToken cancellationToken)
         {
-            int lekID = hash.Decode(req.ID_lek);
-            int chorobaID = hash.Decode(req.ID_choroba);
+            int lekID = _hash.Decode(req.ID_lek);
+            int chorobaID = _hash.Decode(req.ID_choroba);
 
-            var result = context.ChorobaLeks.Where(x => x.IdLek.Equals(lekID) && x.IdChoroba.Equals(chorobaID)).First();
-            context.ChorobaLeks.Remove(result);
+            var result = _context.ChorobaLeks.Where(x => x.IdLek.Equals(lekID) && x.IdChoroba.Equals(chorobaID)).First();
+            _context.ChorobaLeks.Remove(result);
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

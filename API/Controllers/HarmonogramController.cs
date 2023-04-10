@@ -30,6 +30,7 @@ namespace PRO_API.Controllers
             }
         }
 
+
         //ustawia harmonogramy weterynarzom od dzisiejszej daty do daty ostatniego harmonogramu w systemie
         //(może być użyty w przypadku nowych weterynarzy)
         [AuthorizeRoles(RolaEnum.Admin)]
@@ -38,86 +39,9 @@ namespace PRO_API.Controllers
         {
             try
             {
-                return Ok(await Mediator.Send(new UpdateHarmonogramCommand
+                return Ok(await Mediator.Send(new AutoUpdateHarmonogramCommand
                 {
 
-                }, token));
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-        }
-
-
-        //ustawia harmonogramy (według ich godzin pracy) tylko tym weterynarzom którzy danego dnia nie mają ustawionego harmonogramu
-        //[Authorize(Roles = "admin")]
-        /*[HttpPost("day")]
-        public async Task<IActionResult> AddHarmonogramsForADay(DateTime date, CancellationToken token)
-        {
-            try
-            {
-                return Ok(await Mediator.Send(new CreateHarmonogramDefaultCommand
-                {
-                    Data = date
-                }, token));
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-        }*/
-
-
-        //ustawia harmonogramy weterynarzowi na podany dzień według godzin pracy
-        //[Authorize(Roles = "admin")]
-        /*[HttpPost("day/{ID_osoba}")]
-        public async Task<IActionResult> AddWeterynarzHarmonogramForADay(DateTime date, string ID_osoba, CancellationToken token)
-        {
-            try
-            {
-                return Ok(await Mediator.Send(new CreateHarmonogramByIDCommand
-                {
-                    Data = date,
-                    ID_weterynarz = ID_osoba
-                }, token));
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-        }*/
-
-
-        //usuwa harmonogramy na podany dzień wszystkim weterynarzom przy okazji anulując wizyty tego dnia
-        //[Authorize(Roles = "admin")]
-        /*[HttpDelete("day")]
-        public async Task<IActionResult> DeleteHarmonogramsForADay(DateTime date, CancellationToken token)
-        {
-            try
-            {
-                return Ok(await Mediator.Send(new DeleteHarmonogramCommand
-                {
-                    Data = date
-                }, token));
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-        }*/
-
-
-        [AuthorizeRoles(RolaEnum.Admin)]
-        [HttpDelete("day/{ID_osoba}")]
-        public async Task<IActionResult> DeleteWeterynarzHarmonogramForADay(DateTime date, string ID_osoba, CancellationToken token)
-        {
-            try
-            {
-                return Ok(await Mediator.Send(new DeleteHarmonogramByIdCommand
-                {
-                    ID_osoba = ID_osoba,
-                    Data = date
                 }, token));
             }
             catch (Exception e)

@@ -38,7 +38,7 @@ namespace PRO_API.Controllers
         {
             try
             {
-                return Ok(await Mediator.Send(new CreateReceptaLekCommand
+                return Ok(await Mediator.Send(new AddReceptaLekCommand
                 {
                     ID_Recepta = ID_Recepta,
                     ID_Lek = ID_Lek,

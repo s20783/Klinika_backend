@@ -13,25 +13,25 @@ namespace Application.WeterynarzSpecjalizacje.Commands
         public string ID_weterynarz { get; set; }
     }
 
-    public class RemoveSpecjalizacjaWeterynarzCommandHandle : IRequestHandler<RemoveSpecjalizacjaWeterynarzCommand, int>
+    public class RemoveSpecjalizacjaWeterynarzCommandHandler : IRequestHandler<RemoveSpecjalizacjaWeterynarzCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public RemoveSpecjalizacjaWeterynarzCommandHandle(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public RemoveSpecjalizacjaWeterynarzCommandHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(RemoveSpecjalizacjaWeterynarzCommand req, CancellationToken cancellationToken)
         {
-            (int id1, int id2) = hash.Decode(req.ID_specjalizacja, req.ID_weterynarz);
+            (int id1, int id2) = _hash.Decode(req.ID_specjalizacja, req.ID_weterynarz);
 
-            context.WeterynarzSpecjalizacjas.Remove(
-                context.WeterynarzSpecjalizacjas.Where(x => x.IdSpecjalizacja == id1 && x.IdOsoba == id2).First()
+            _context.WeterynarzSpecjalizacjas.Remove(
+                _context.WeterynarzSpecjalizacjas.Where(x => x.IdSpecjalizacja == id1 && x.IdOsoba == id2).First()
                 );
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

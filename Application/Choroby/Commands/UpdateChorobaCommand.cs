@@ -19,24 +19,24 @@ namespace Application.Choroby.Commands
 
     public class UpdateChorobaCommandHandler : IRequestHandler<UpdateChorobaCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly ICache<GetChorobaResponse> cache;
-        public UpdateChorobaCommandHandler(IKlinikaContext klinikaContext, IHash ihash, ICache<GetChorobaResponse> _cache)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly ICache<GetChorobaResponse> _cache;
+        public UpdateChorobaCommandHandler(IKlinikaContext klinikaContext, IHash hash, ICache<GetChorobaResponse> cache)
         {
-            context = klinikaContext;
-            hash = ihash;
-            cache = _cache;
+            _context = klinikaContext;
+            _hash = hash;
+            _cache = cache;
         }
 
         public async Task<int> Handle(UpdateChorobaCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_Choroba);
-            var choroba = context.Chorobas.Where(x => x.IdChoroba.Equals(id)).First();
+            int id = _hash.Decode(req.ID_Choroba);
+            var choroba = _context.Chorobas.Where(x => x.IdChoroba.Equals(id)).First();
 
             if (!choroba.Nazwa.Equals(req.request.Nazwa))
             {
-                if (context.Chorobas.Where(x => x.Nazwa.Equals(req.request.Nazwa)).Any())
+                if (_context.Chorobas.Where(x => x.Nazwa.Equals(req.request.Nazwa)).Any())
                 {
                     throw new Exception("already exists");
                 }
@@ -46,8 +46,8 @@ namespace Application.Choroby.Commands
             choroba.NazwaLacinska = req.request.NazwaLacinska;
             choroba.Opis = req.request.Opis;
 
-            int result = await context.SaveChangesAsync(cancellationToken);
-            cache.Remove();
+            int result = await _context.SaveChangesAsync(cancellationToken);
+            _cache.Remove();
 
             return result;
         }

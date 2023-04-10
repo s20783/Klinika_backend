@@ -1,6 +1,8 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,29 +19,26 @@ namespace Application.Urlopy.Queries
 
     public class UrlopDetailsQueryHandler : IRequestHandler<UrlopDetailsQuery, GetUrlopResponse>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public UrlopDetailsQueryHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IMapper _mapper;
+        public UrlopDetailsQueryHandler(IKlinikaContext klinikaContext, IHash hash, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
+            _mapper = mapper;
         }
 
         public async Task<GetUrlopResponse> Handle(UrlopDetailsQuery req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_urlop);
+            int id = _hash.Decode(req.ID_urlop);
 
-            return (from x in context.Urlops
-                 join w in context.Osobas on x.IdOsoba equals w.IdOsoba
-                 join y in context.Osobas on w.IdOsoba equals y.IdOsoba
-                 where x.IdUrlop == id
-                 select new GetUrlopResponse()
-                 {
-                     IdUrlop = req.ID_urlop,
-                     ID_Weterynarz = hash.Encode(x.IdOsoba),
-                     Weterynarz = y.Imie + " " + y.Nazwisko,
-                     Dzien = x.Dzien
-                 }).First();
+            return _mapper.Map<GetUrlopResponse>(await _context.Urlops
+                .Include(x => x.IdOsobaNavigation)
+                .ThenInclude(x => x.IdOsobaNavigation)
+                .Where(x => x.IdUrlop == id)
+                .FirstOrDefaultAsync(cancellationToken)
+                 );
         }
     }
 }

@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Application.Interfaces
 {
-    public interface ILoginRepository
+    public interface ILogin
     {
-        public bool CheckCredentails(Osoba user, IPasswordRepository passwordRepository, string haslo, int iterations);
+        public bool CheckCredentails(Osoba user, IPassword passwordRepository, string haslo, int iterations);
     }
 }

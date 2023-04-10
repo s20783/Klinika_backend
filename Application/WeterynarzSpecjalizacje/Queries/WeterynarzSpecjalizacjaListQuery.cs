@@ -1,6 +1,8 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -13,30 +15,28 @@ namespace Application.WeterynarzSpecjalizacje.Queries
         public string ID_weterynarz { get; set; }
     }
 
-    public class SpecjalizacjaDetailsQueryHandle : IRequestHandler<WeterynarzSpecjalizacjaListQuery, List<GetSpecjalizacjaResponse>>
+    public class SpecjalizacjaDetailsQueryHandler : IRequestHandler<WeterynarzSpecjalizacjaListQuery, List<GetSpecjalizacjaResponse>>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public SpecjalizacjaDetailsQueryHandle(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IMapper _mapper;
+        public SpecjalizacjaDetailsQueryHandler(IKlinikaContext klinikaContext, IHash hash, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
+            _mapper = mapper;
         }
 
         public async Task<List<GetSpecjalizacjaResponse>> Handle(WeterynarzSpecjalizacjaListQuery req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_weterynarz);
+            int id = _hash.Decode(req.ID_weterynarz);
 
-            return (from x in context.WeterynarzSpecjalizacjas
-                    join s in context.Specjalizacjas on x.IdSpecjalizacja equals s.IdSpecjalizacja
-                    where x.IdOsoba == id
-                    orderby s.Nazwa
-                    select new GetSpecjalizacjaResponse()
-                    {
-                        IdSpecjalizacja = hash.Encode(x.IdSpecjalizacja),
-                        Nazwa = s.Nazwa,
-                        Opis = s.Opis
-                    }).ToList();
+            return _mapper.Map<List<GetSpecjalizacjaResponse>>(_context.WeterynarzSpecjalizacjas
+                .Include(x => x.IdSpecjalizacjaNavigation)
+                .Where(x => x.IdOsoba == id)
+                .OrderBy(x => x.IdSpecjalizacjaNavigation.Nazwa)
+                .ToListAsync(cancellationToken)
+                );
         }
     }
 }

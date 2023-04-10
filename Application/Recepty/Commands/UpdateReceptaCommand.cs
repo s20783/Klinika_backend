@@ -15,39 +15,26 @@ namespace Application.Recepty.Commands
     {
         public string ID_recepta { get; set; }
         public string Zalecenia { get; set; }
-        //public List<ReceptaLekRequest2> Leki { get; set; }
     }
 
     public class UpdateReceptaCommandHandler : IRequestHandler<UpdateReceptaCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public UpdateReceptaCommandHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public UpdateReceptaCommandHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(UpdateReceptaCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_recepta);
+            int id = _hash.Decode(req.ID_recepta);
 
-            //context.ReceptaLeks.RemoveRange(context.ReceptaLeks.Where(x => x.IdWizyta == id).ToList());
-
-            var recepta = context.Recepta.Where(x => x.IdWizyta.Equals(id)).First();
+            var recepta = _context.Recepta.Where(x => x.IdWizyta.Equals(id)).First();
             recepta.Zalecenia = req.Zalecenia;
 
-            /*foreach (var i in req.Leki)
-            {
-                context.ReceptaLeks.Add(new ReceptaLek
-                {
-                    IdWizyta = id,
-                    IdLek = hash.Decode(i.ID_Lek),
-                    Ilosc = i.Ilosc,
-                });
-            }*/
-
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

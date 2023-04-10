@@ -32,7 +32,7 @@ namespace Test.Mock
             var before = mockContext.Object.ReceptaLeks.Count();
             var handler = new CreateReceptaLekCommandHandler(mockContext.Object, hash);
 
-            var command = new CreateReceptaLekCommand()
+            var command = new AddReceptaLekCommand()
             {
                 ID_Lek = hash.Encode(1),
                 ID_Recepta = hash.Encode(1),

@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Application.Weterynarze.Queries
 {
-    public class WeterynarzQueryValidator : AbstractValidator<WeterynarzQuery>
+    public class WeterynarzDetailsQueryValidator : AbstractValidator<WeterynarzDetailsQuery>
     {
-        public WeterynarzQueryValidator()
+        public WeterynarzDetailsQueryValidator()
         {
             RuleFor(x => x.ID_osoba).NotEmpty();
         }

@@ -1,6 +1,8 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,30 +19,26 @@ namespace Application.Uslugi.Queries
 
     public class UslugaWizytaListQueryHandler : IRequestHandler<UslugaWizytaListQuery, List<GetUslugaResponse>>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public UslugaWizytaListQueryHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IMapper _mapper;
+        public UslugaWizytaListQueryHandler(IKlinikaContext klinikaContext, IHash hash, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
+            _mapper = mapper;
         }
 
         public async Task<List<GetUslugaResponse>> Handle(UslugaWizytaListQuery req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_wizyta);
+            int id = _hash.Decode(req.ID_wizyta);
 
-            return (from x in context.WizytaUslugas
-                    join y in context.Uslugas on x.IdUsluga equals y.IdUsluga
-                    where x.IdWizyta == id
-                    select new GetUslugaResponse()
-                    {
-                        ID_Usluga = hash.Encode(x.IdUsluga),
-                        NazwaUslugi = y.NazwaUslugi,
-                        Opis = y.Opis,
-                        Cena = y.Cena,
-                        Narkoza = y.Narkoza,
-                        Dolegliwosc = y.Dolegliwosc
-                    }).ToList();
+            return _mapper.Map<List<GetUslugaResponse>>(_context.WizytaUslugas
+                .Include(x => x.IdUslugaNavigation)
+                .Where(x => x.IdWizyta == id)
+                .OrderBy(x => x.IdUslugaNavigation.NazwaUslugi)
+                .ToListAsync(cancellationToken)
+                );
         }
     }
 }

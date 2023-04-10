@@ -42,7 +42,7 @@ namespace Test.Mock
         [Test]
         public async Task UpdateWeterynarzShouldBeCorrectTest()
         {
-            var handler = new UpdateWeterynarzCommandHandle(mockContext.Object, hash, new MemoryMockCache<GetWeterynarzListResponse>());
+            var handler = new UpdateWeterynarzCommandHandler(mockContext.Object, hash, new MemoryMockCache<GetWeterynarzListResponse>());
 
             UpdateWeterynarzCommand command = new UpdateWeterynarzCommand()
             {
@@ -66,7 +66,7 @@ namespace Test.Mock
         [Test]
         public void UpdateWeterynarzShouldThrowAnExceptionTest()
         {
-            var handler = new UpdateWeterynarzCommandHandle(mockContext.Object, hash, new MemoryMockCache<GetWeterynarzListResponse>());
+            var handler = new UpdateWeterynarzCommandHandler(mockContext.Object, hash, new MemoryMockCache<GetWeterynarzListResponse>());
 
             UpdateWeterynarzCommand command = new UpdateWeterynarzCommand()
             {
@@ -88,7 +88,7 @@ namespace Test.Mock
         [Test]
         public async Task DeleteWeterynarzShouldBeCorrectTest()
         {
-            var handler = new DeleteWeterynarzCommandHandle(mockContext.Object, hash, new MemoryMockCache<GetWeterynarzListResponse>(), harmonogramService);
+            var handler = new DeleteWeterynarzCommandHandler(mockContext.Object, hash, new MemoryMockCache<GetWeterynarzListResponse>(), harmonogramService);
 
             DeleteWeterynarzCommand command = new DeleteWeterynarzCommand()
             {
@@ -105,7 +105,7 @@ namespace Test.Mock
         [Test]
         public void DeleteWeterynarzShouldThrowAnExceptionTest()
         {
-            var handler = new DeleteWeterynarzCommandHandle(mockContext.Object, hash, new MemoryMockCache<GetWeterynarzListResponse>(), harmonogramService);
+            var handler = new DeleteWeterynarzCommandHandler(mockContext.Object, hash, new MemoryMockCache<GetWeterynarzListResponse>(), harmonogramService);
 
             DeleteWeterynarzCommand command = new DeleteWeterynarzCommand()
             {

@@ -12,28 +12,28 @@ namespace Application.WeterynarzSpecjalizacje.Commands
         public string ID_weterynarz { get; set; }
     }
 
-    public class AddSpecjalizacjaWeterynarzCommandHandle : IRequestHandler<AddSpecjalizacjaWeterynarzCommand, int>
+    public class AddSpecjalizacjaWeterynarzCommandHandler : IRequestHandler<AddSpecjalizacjaWeterynarzCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public AddSpecjalizacjaWeterynarzCommandHandle(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public AddSpecjalizacjaWeterynarzCommandHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(AddSpecjalizacjaWeterynarzCommand req, CancellationToken cancellationToken)
         {
-            (int id1, int id2) = hash.Decode(req.ID_specjalizacja, req.ID_weterynarz);
+            (int id1, int id2) = _hash.Decode(req.ID_specjalizacja, req.ID_weterynarz);
 
-            context.WeterynarzSpecjalizacjas.Add(
+            _context.WeterynarzSpecjalizacjas.Add(
                 new WeterynarzSpecjalizacja
                 {
                     IdSpecjalizacja = id1,
                     IdOsoba = id2
                 });
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

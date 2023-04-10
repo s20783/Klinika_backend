@@ -13,6 +13,5 @@ namespace Application.DTO.Responses
         public string Nazwisko { get; set; }
         public string NumerTelefonu { get; set; }
         public string Email { get; set; }
-        public DateTime DataZatrudnienia { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Domain.Enums;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -42,7 +43,7 @@ namespace PRO_API.Controllers
         protected bool isAdmin()
         {
             var role = GetUserRole();
-            if (role.Equals("admin"))
+            if (role.Equals(nameof(RolaEnum.Admin)))
             {
                 return true;
             }
@@ -53,7 +54,7 @@ namespace PRO_API.Controllers
         protected bool isWeterynarz()
         {
             var role = GetUserRole();
-            if (role.Equals("weterynarz"))
+            if (role.Equals(nameof(RolaEnum.Weterynarz)))
             {
                 return true;
             }
@@ -64,7 +65,7 @@ namespace PRO_API.Controllers
         protected bool isKlient()
         {
             var role = GetUserRole();
-            if (role.Equals("klient"))
+            if (role.Equals(nameof(RolaEnum.Klient)))
             {
                 return true;
             }

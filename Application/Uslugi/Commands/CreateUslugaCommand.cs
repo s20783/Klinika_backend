@@ -19,19 +19,17 @@ namespace Application.Uslugi.Commands
 
     public class CreateUslugaCommandHandler : IRequestHandler<CreateUslugaCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly ICache<GetUslugaResponse> cache;
-        public CreateUslugaCommandHandler(IKlinikaContext klinikaContext, IHash ihash, ICache<GetUslugaResponse> _cache)
+        private readonly IKlinikaContext _context;
+        private readonly ICache<GetUslugaResponse> _cache;
+        public CreateUslugaCommandHandler(IKlinikaContext klinikaContext, ICache<GetUslugaResponse> cache)
         {
-            context = klinikaContext;
-            hash = ihash;
-            cache = _cache;
+            _context = klinikaContext;
+            _cache = cache;
         }
 
         public async Task<int> Handle(CreateUslugaCommand req, CancellationToken cancellationToken)
         {
-            context.Uslugas.Add(new Usluga
+            _context.Uslugas.Add(new Usluga
             {
                 NazwaUslugi = req.request.NazwaUslugi,
                 Opis = req.request.Opis,
@@ -40,8 +38,8 @@ namespace Application.Uslugi.Commands
                 Narkoza = req.request.Narkoza
             });
 
-            int result = await context.SaveChangesAsync(cancellationToken);
-            cache.Remove();
+            int result = await _context.SaveChangesAsync(cancellationToken);
+            _cache.Remove();
 
             return result;
         }

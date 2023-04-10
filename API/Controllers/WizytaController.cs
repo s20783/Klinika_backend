@@ -25,7 +25,7 @@ namespace PRO_API.Controllers
             }, token));
         }
 
-        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz, RolaEnum.Klient)]
         [HttpGet("moje_wizyty")]
         public async Task<IActionResult> GetWizytaKlient(CancellationToken token)
         {
@@ -78,9 +78,9 @@ namespace PRO_API.Controllers
                     ID_Pacjent = ID_Pacjent
                 }, token));
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return NotFound();
+                return NotFound(e);
             }
         }
 
@@ -118,7 +118,7 @@ namespace PRO_API.Controllers
             {
                 if (isKlient())
                 {
-                    return Ok(await Mediator.Send(new UmowWizyteKlientCommand
+                    return Ok(await Mediator.Send(new CreateWizytaKlientCommand
                     {
                         ID_klient = GetUserId(),
                         ID_pacjent = request.ID_Pacjent,
@@ -127,7 +127,7 @@ namespace PRO_API.Controllers
                     }, token));
                 }
 
-                return Ok(await Mediator.Send(new UmowWizyteKlientCommand
+                return Ok(await Mediator.Send(new CreateWizytaKlientCommand
                 {
                     ID_klient = request.ID_Klient,
                     ID_pacjent = request.ID_Pacjent,
@@ -175,7 +175,7 @@ namespace PRO_API.Controllers
             {
                 if (isKlient())
                 {
-                    return Ok(await Mediator.Send(new PrzelozWizyteCommand
+                    return Ok(await Mediator.Send(new UpdateWizytaDateCommand
                     {
                         ID_wizyta = ID_wizyta,
                         //ID_klient = GetUserId(),
@@ -185,7 +185,7 @@ namespace PRO_API.Controllers
                     }, token));
                 }
 
-                return Ok(await Mediator.Send(new PrzelozWizyteCommand
+                return Ok(await Mediator.Send(new UpdateWizytaDateCommand
                 {
                     ID_wizyta = ID_wizyta,
                     //ID_klient = request.ID_Klient,

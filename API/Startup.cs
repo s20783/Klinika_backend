@@ -1,12 +1,13 @@
 using Application;
+using Application.Common;
 using Application.Interfaces;
+using AutoMapper;
 using Domain;
 using FluentValidation;
 using Hangfire;
 using Hangfire.MemoryStorage;
 using HashidsNet;
 using Infrastructure;
-using Infrastructure.Models;
 using Infrastructure.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -41,10 +42,8 @@ namespace PRO_API
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-
         }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IHashids>(x => new Hashids(Configuration["HashidsSecret"], 7));
@@ -76,15 +75,6 @@ namespace PRO_API
             services.AddHangfire(configuration => configuration.UseMemoryStorage());
             services.AddHangfireServer();
 
-            /*.UseSqlServerStorage(Configuration.GetConnectionString("HangfireConnection"), new SqlServerStorageOptions
-            {
-                CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-                SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
-                QueuePollInterval = TimeSpan.Zero,
-                UseRecommendedIsolationLevel = true,
-                DisableGlobalLocks = true
-            }));*/
-
 
             var emailConfig = Configuration
                 .GetSection("EmailConfiguration")
@@ -92,9 +82,18 @@ namespace PRO_API
             services.AddSingleton(emailConfig);
 
             services.AddControllers().AddNewtonsoftJson(Configuration => Configuration.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
-            services.AddInfrastructure()
+            services
+                .AddInfrastructure()
                 .AddApplication()
                 .AddDomain();
+
+
+            services.AddSingleton(provider => new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile(new MapperProfile(provider.CreateScope().ServiceProvider.GetService<IHash>()));
+
+            }).CreateMapper());
+
 
             services.AddSwaggerGen(c =>
             {
@@ -153,8 +152,6 @@ namespace PRO_API
                 
             }
 
-            
-
             app.UseHttpsRedirection();
 
             app.UseRouting();
@@ -181,8 +178,8 @@ namespace PRO_API
             //wyœlij Email z przypomnieniem o nastêpnym obowi¹zkowym szczepieniu, uruchamiane co 2 tygodnie o 9:00
             recurringJobManager.AddOrUpdate<ScheduleService>("send szczepienie email", service => service.SendSzczepienieEmail(), "0 9 */14 * *");
 
-            //co 6 miesi¹cy, pierwszego dnia miesi¹ca
-            recurringJobManager.AddOrUpdate<ScheduleService>("delete cancelled appointments", service => service.DeleteWizytaSystemAsync(), "0 4 1 */6 *");
+            //co poniedzia³ek
+            recurringJobManager.AddOrUpdate<ScheduleService>("delete cancelled appointments", service => service.DeleteWizytaSystemAsync(), "0 7 * * 1");
         }
     }
 }

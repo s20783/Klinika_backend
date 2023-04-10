@@ -1,7 +1,6 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
 using Domain.Models;
-using Infrastructure.Models;
 using Infrastructure.Services;
 using Infrastructure.Services.Caching;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,12 +11,12 @@ namespace Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
-            services.AddScoped<ITokenRepository, TokenService>();
-            services.AddScoped<IPasswordRepository, PasswordService>();
+            services.AddScoped<IToken, TokenService>();
+            services.AddScoped<IPassword, PasswordService>();
             services.AddScoped<IHash, HashService>();
-            services.AddScoped<IWizytaRepository, WizytaService>();
-            services.AddScoped<ILoginRepository, LoginService>();
-            services.AddScoped<IHarmonogramRepository, HarmonogramService>();
+            services.AddScoped<IWizyta, WizytaService>();
+            services.AddScoped<ILogin, LoginService>();
+            services.AddScoped<IHarmonogram, HarmonogramService>();
             services.AddScoped<IEmailSender, EmailSender>();
 
             services.AddScoped<ICache<GetPacjentListResponse>, PacjentCache>();

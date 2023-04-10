@@ -20,21 +20,21 @@ namespace Application.Pacjenci.Commands
 
     public class CreatePacjentCommandHandle : IRequestHandler<CreatePacjentCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly ICache<GetPacjentListResponse> cache;
-        public CreatePacjentCommandHandle(IKlinikaContext klinikaContext, IHash ihash, ICache<GetPacjentListResponse> _cache)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly ICache<GetPacjentListResponse> _cache;
+        public CreatePacjentCommandHandle(IKlinikaContext klinikaContext, IHash hash, ICache<GetPacjentListResponse> cache)
         {
-            context = klinikaContext;
-            hash = ihash;
-            cache = _cache;
+            _context = klinikaContext;
+            _hash = hash;
+            _cache = cache;
         }
 
         public async Task<int> Handle(CreatePacjentCommand req, CancellationToken cancellationToken)
         {
-            context.Pacjents.Add(new Pacjent
+            _context.Pacjents.Add(new Pacjent
             {
-                IdOsoba = hash.Decode(req.request.IdOsoba),
+                IdOsoba = _hash.Decode(req.request.IdOsoba),
                 Nazwa = req.request.Nazwa,
                 Gatunek = req.request.Gatunek,
                 Rasa = req.request.Rasa,
@@ -46,8 +46,8 @@ namespace Application.Pacjenci.Commands
                 Ubezplodnienie = req.request.Ubezplodnienie
             });
 
-            int result = await context.SaveChangesAsync(cancellationToken);
-            cache.Remove();
+            int result = await _context.SaveChangesAsync(cancellationToken);
+            _cache.Remove();
 
             return result;
         }

@@ -18,26 +18,26 @@ namespace Application.WizytaChoroby.Commands
 
     public class AddWizytaChorobaCommandHandler : IRequestHandler<AddWizytaChorobaCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public AddWizytaChorobaCommandHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public AddWizytaChorobaCommandHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(AddWizytaChorobaCommand req, CancellationToken cancellationToken)
         {
-            (int id1, int id2) = hash.Decode(req.ID_wizyta, req.ID_choroba);
+            (int id1, int id2) = _hash.Decode(req.ID_wizyta, req.ID_choroba);
 
-            context.WizytaChorobas.Add(
+            _context.WizytaChorobas.Add(
                 new WizytaChoroba
                 {
                     IdWizyta = id1,
                     IdChoroba = id2
                 });
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.DTO.Responses
 {
-    public class GodzinyPracyResponse
+    public class GetGodzinyPracyResponse
     {
         public int DzienTygodnia { get; set; }
         public TimeSpan GodzinaRozpoczecia { get; set; }

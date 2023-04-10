@@ -30,7 +30,7 @@ namespace PRO_API.Controllers
         [HttpGet("{ID_osoba}")]
         public async Task<IActionResult> GetWeterynarzById(string ID_osoba, CancellationToken token)
         {
-            return Ok(await Mediator.Send(new WeterynarzQuery
+            return Ok(await Mediator.Send(new WeterynarzDetailsQuery
             {
                 ID_osoba = ID_osoba
             }, token));

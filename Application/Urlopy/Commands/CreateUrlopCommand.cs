@@ -15,35 +15,35 @@ namespace Application.Urlopy.Commands
 
     public class CreateUrlopCommandHandler : IRequestHandler<CreateUrlopCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly IHarmonogramRepository harmonogramService;
-        public CreateUrlopCommandHandler(IKlinikaContext klinikaContext, IHash _hash, IHarmonogramRepository harmonogramRepository)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IHarmonogram _harmonogramService;
+        public CreateUrlopCommandHandler(IKlinikaContext klinikaContext, IHash hash, IHarmonogram harmonogram)
         {
-            context = klinikaContext;
-            hash = _hash;
-            harmonogramService = harmonogramRepository;
+            _context = klinikaContext;
+            _hash = hash;
+            _harmonogramService = harmonogram;
         }
 
         public async Task<int> Handle(CreateUrlopCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.request.ID_weterynarz);
+            int id = _hash.Decode(req.request.ID_weterynarz);
 
-            if(context.Urlops.Where(x => x.Dzien.Date.Equals(req.request.Dzien) && x.IdOsoba.Equals(id)).Any())
+            if(_context.Urlops.Where(x => x.Dzien.Date.Equals(req.request.Dzien) && x.IdOsoba.Equals(id)).Any())
             {
                 throw new Exception("Taki urlop już istnieje");
             }
 
-            context.Urlops.Add(new Domain.Models.Urlop
+            _context.Urlops.Add(new Domain.Models.Urlop
             {
                 IdOsoba = id,
                 Dzien = req.request.Dzien.Date
             });
 
-            var harmonograms = context.Harmonograms.Where(x => x.DataRozpoczecia.Date.Equals(req.request.Dzien.Date) && x.WeterynarzIdOsoba.Equals(id)).ToList();
-            await harmonogramService.DeleteHarmonograms(harmonograms, context);
+            var harmonograms = _context.Harmonograms.Where(x => x.DataRozpoczecia.Date.Equals(req.request.Dzien.Date) && x.WeterynarzIdOsoba.Equals(id)).ToList();
+            await _harmonogramService.DeleteHarmonograms(harmonograms, _context);
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

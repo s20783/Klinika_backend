@@ -23,12 +23,12 @@ namespace Application.Leki.Queries
 
     public class GetLekListQueryHandle : IRequestHandler<LekListQuery, PaginatedResponse<GetLekListResponse>>
     {
-        private readonly IConfiguration configuration;
-        private readonly IHash hash;
-        public GetLekListQueryHandle(IConfiguration config, IHash _hash)
+        private readonly IConfiguration _configuration;
+        private readonly IHash _hash;
+        public GetLekListQueryHandle(IConfiguration config, IHash hash)
         {
-            configuration = config;
-            hash = _hash;
+            _configuration = config;
+            _hash = hash;
         }
 
         public async Task<PaginatedResponse<GetLekListResponse>> Handle(LekListQuery req, CancellationToken cancellationToken)
@@ -38,7 +38,7 @@ namespace Application.Leki.Queries
                 "GROUP BY Nazwa, Jednostka_Miary, l.ID_lek, l.Producent " +
                 "ORDER BY Nazwa";
 
-            SqlConnection connection = new SqlConnection(configuration.GetConnectionString("KlinikaDatabase"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("KlinikaDatabase"));
             await connection.OpenAsync();
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -49,7 +49,7 @@ namespace Application.Leki.Queries
             {
                 list.Add(new GetLekListResponse
                 {
-                    IdLek = hash.Encode(int.Parse(reader["ID_lek"].ToString())),
+                    IdLek = _hash.Encode(int.Parse(reader["ID_lek"].ToString())),
                     Nazwa = reader["Nazwa"].ToString(),
                     Ilosc = int.Parse(reader["Ilosc"].ToString()),
                     JednostkaMiary = reader["Jednostka_Miary"].ToString(),

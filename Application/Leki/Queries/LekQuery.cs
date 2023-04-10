@@ -14,21 +14,21 @@ namespace Application.Leki.Queries
 
     public class LekQueryHandler : IRequestHandler<LekQuery, object>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public LekQueryHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public LekQueryHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<object> Handle(LekQuery req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_lek);
+            int id = _hash.Decode(req.ID_lek);
 
-            var t = context.Leks.Where(x => x.IdLek.Equals(id)).First();
+            var t = _context.Leks.Where(x => x.IdLek.Equals(id)).First();
 
-            if (!context.LekWMagazynies.Where(x => x.IdLek.Equals(id)).Any())
+            if (!_context.LekWMagazynies.Where(x => x.IdLek.Equals(id)).Any())
             {
                 return new {
                     Nazwa = t.Nazwa,
@@ -44,21 +44,21 @@ namespace Application.Leki.Queries
                 Nazwa = t.Nazwa,
                 JednostkaMiary = t.JednostkaMiary,
                 Producent = t.Producent,
-                Choroby = (from i in context.ChorobaLeks
-                           join j in context.Chorobas on i.IdChoroba equals j.IdChoroba into qs
+                Choroby = (from i in _context.ChorobaLeks
+                           join j in _context.Chorobas on i.IdChoroba equals j.IdChoroba into qs
                            from j in qs.DefaultIfEmpty()
                            where i.IdLek == id
                            select new
                            {
-                               IdChoroba = hash.Encode(j.IdChoroba),
+                               IdChoroba = _hash.Encode(j.IdChoroba),
                                Nazwa = j.Nazwa,
                                NazwaLacinska = j.NazwaLacinska
                            }).ToList(),
-                LekList = (from y in context.LekWMagazynies
+                LekList = (from y in _context.LekWMagazynies
                            where y.IdLek == id
                            select new GetStanLekuResponse()
                            {
-                               IdStanLeku = hash.Encode(y.IdStanLeku),
+                               IdStanLeku = _hash.Encode(y.IdStanLeku),
                                Ilosc = y.Ilosc,
                                DataWaznosci = y.DataWaznosci,
                            }).ToList()

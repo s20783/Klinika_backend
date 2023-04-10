@@ -1,7 +1,7 @@
-﻿using Application.Znizki.Commands;
-using Application.Znizki.Queries;
-using Microsoft.AspNetCore.Authorization;
+﻿using Application.Znizki.Queries;
+using Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
+using PRO_API.Common;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,7 +10,7 @@ namespace PRO_API.Controllers
 {
     public class ZnizkaController : ApiControllerBase
     {
-        [Authorize(Roles = "admin")]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpGet]
         public async Task<IActionResult> GetZnizkaList(CancellationToken token)
         {
@@ -27,8 +27,8 @@ namespace PRO_API.Controllers
             }
         }
 
-        [Authorize(Roles = "admin")]
-        [HttpGet("details/{ID_znizka}")]
+        [AuthorizeRoles(RolaEnum.Admin)]
+        [HttpGet("{ID_znizka}")]
         public async Task<IActionResult> GetZnizkaDetails(string ID_znizka, CancellationToken token)
         {
             try
@@ -42,27 +42,6 @@ namespace PRO_API.Controllers
             {
                 return NotFound();
             }
-        }
-
-        [Authorize(Roles = "admin")]
-        [HttpPut("{ID_znizka}")]
-        public async Task<IActionResult> UpdateZnizka(string ID_znizka, string ZnizkaNazwa, decimal ProcentZnizki, CancellationToken token)
-        {
-            try
-            {
-                await Mediator.Send(new UpdateZnizkaCommand
-                {
-                    ID_znizka = ID_znizka,
-                    Nazwa = ZnizkaNazwa,
-                    Procent = ProcentZnizki
-                }, token);
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
-
-            return NoContent();
         }
     }
 }

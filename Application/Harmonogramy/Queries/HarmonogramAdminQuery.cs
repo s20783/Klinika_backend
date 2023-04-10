@@ -16,12 +16,12 @@ namespace Application.Harmonogramy.Queries
 
     public class HarmonogramAdminQueryHandle : IRequestHandler<HarmonogramAdminQuery, object>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public HarmonogramAdminQueryHandle(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public HarmonogramAdminQueryHandle(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<object> Handle(HarmonogramAdminQuery req, CancellationToken cancellationToken)
@@ -30,21 +30,21 @@ namespace Application.Harmonogramy.Queries
             var EndDate = req.Date.AddDays(7 - (int)req.Date.DayOfWeek);
 
             var results =
-                (from x in context.Harmonograms
-                 join z in context.Wizyta on x.IdWizyta equals z.IdWizyta into wizyta
+                (from x in _context.Harmonograms
+                 join z in _context.Wizyta on x.IdWizyta equals z.IdWizyta into wizyta
                  from t in wizyta.DefaultIfEmpty()
-                 join w in context.Osobas on x.WeterynarzIdOsoba equals w.IdOsoba
+                 join w in _context.Osobas on x.WeterynarzIdOsoba equals w.IdOsoba
                  where x.DataRozpoczecia.Date >= StartDate && x.DataZakonczenia.Date <= EndDate
                  select new GetHarmonogramAdminResponse()
                  {
-                     IdHarmonogram = hash.Encode(x.IdHarmonogram),
-                     IdWizyta = x.IdWizyta != null ? hash.Encode((int)x.IdWizyta) : null,
-                     IdWeterynarz = hash.Encode(x.WeterynarzIdOsoba),
+                     IdHarmonogram = _hash.Encode(x.IdHarmonogram),
+                     IdWizyta = x.IdWizyta != null ? _hash.Encode((int)x.IdWizyta) : null,
+                     IdWeterynarz = _hash.Encode(x.WeterynarzIdOsoba),
                      Weterynarz = w.Imie + " " + w.Nazwisko,
                      Dzien = (int)x.DataRozpoczecia.DayOfWeek,
                      Data = x.DataRozpoczecia,
-                     IdKlient = x.IdWizyta != null ? hash.Encode(t.IdOsoba) : null,
-                     Klient = x.IdWizyta != null ? context.Osobas.Where(k => k.IdOsoba == t.IdOsoba).Select(k => k.Imie + " " + k.Nazwisko).First() : null,
+                     IdKlient = x.IdWizyta != null ? _hash.Encode(t.IdOsoba) : null,
+                     Klient = x.IdWizyta != null ? _context.Osobas.Where(k => k.IdOsoba == t.IdOsoba).Select(k => k.Imie + " " + k.Nazwisko).First() : null,
                      //IdPacjent = x.IdWizyta != null ? hash.Encode((int)t.IdPacjent) : null,
                      //Pacjent = x.IdWizyta != null ? context.Pacjents.Where(p => p.IdPacjent == t.IdPacjent).Select(p => p.Nazwa).FirstOrDefault() : null,
                      CzyZajete = x.IdWizyta != null

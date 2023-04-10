@@ -14,24 +14,6 @@ namespace PRO_API.Controllers
 {
     public class GodzinyPracyController : ApiControllerBase
     {
-        [AuthorizeRoles(RolaEnum.Admin)]
-        [HttpGet("{ID_osoba}")]
-        public async Task<IActionResult> GetGodzinyPracyDzien(string ID_osoba, int Dzien, CancellationToken token)
-        {
-            try
-            {
-                return Ok(await Mediator.Send(new GodzinyPracyDzienQuery
-                {
-                    ID_osoba = ID_osoba,
-                    Dzien = Dzien
-                }, token));
-            }
-            catch (Exception)
-            {
-                return NotFound();
-            }
-        }
-
         [AuthorizeRoles(RolaEnum.Weterynarz)]
         [HttpGet("moje_godziny")]
         public async Task<IActionResult> GetGodzinyPracyWeterynarz(CancellationToken token)
@@ -50,7 +32,7 @@ namespace PRO_API.Controllers
         }
 
         [AuthorizeRoles(RolaEnum.Admin)]
-        [HttpGet("list/{ID_osoba}")]
+        [HttpGet("{ID_osoba}")]
         public async Task<IActionResult> GetGodzinyPracy(string ID_osoba, CancellationToken token)
         {
             try

@@ -18,23 +18,23 @@ namespace Application.LekiWMagazynie.Commands
 
     public class UpdateStanLekuCommandHandler : IRequestHandler<UpdateStanLekuCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public UpdateStanLekuCommandHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public UpdateStanLekuCommandHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(UpdateStanLekuCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_stan_leku);
+            int id = _hash.Decode(req.ID_stan_leku);
 
-            var stanLeku = context.LekWMagazynies.Where(x => x.IdStanLeku == id).FirstOrDefault();
+            var stanLeku = _context.LekWMagazynies.Where(x => x.IdStanLeku == id).FirstOrDefault();
             stanLeku.Ilosc = req.request.Ilosc;
             stanLeku.DataWaznosci = req.request.DataWaznosci.Date;
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,33 +19,25 @@ namespace Application.Klienci.Queries
 
     public class GetKlientQueryHandle : IRequestHandler<KlientQuery, GetKlientResponse>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public GetKlientQueryHandle(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IMapper _mapper;
+        public GetKlientQueryHandle(IKlinikaContext klinikaContext, IHash hash, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
+            _mapper = mapper;
         }
 
         public async Task<GetKlientResponse> Handle(KlientQuery req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_osoba);
+            int id = _hash.Decode(req.ID_osoba);
 
-            var result =
-                from x in context.Osobas
-                join y in context.Klients on x.IdOsoba equals y.IdOsoba into ps
-                from p in ps
-                where x.IdOsoba == id
-                select new GetKlientResponse()
-                {
-                    Imie = x.Imie,
-                    Nazwisko = x.Nazwisko,
-                    NumerTelefonu = x.NumerTelefonu,
-                    Email = x.Email,
-                    DataZalozeniaKonta = p.DataZalozeniaKonta
-                };
-
-            return result.FirstOrDefault();
+            return _mapper.Map<GetKlientResponse>(await _context.Osobas
+                .Include(x => x.Klient)
+                .Where(x => x.IdOsoba == id)
+                .FirstOrDefaultAsync(cancellationToken)
+                );
         }
     }
 }

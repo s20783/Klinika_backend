@@ -1,6 +1,8 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,31 +17,29 @@ namespace Application.ChorobaLeki.Queries
         public string ID_lek { get; set; }
     }
 
-    public class SpecjalizacjaDetailsQueryHandle : IRequestHandler<ChorobaLekListQuery, List<GetChorobaResponse>>
+    public class ChorobaLekListQueryHandle : IRequestHandler<ChorobaLekListQuery, List<GetChorobaResponse>>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public SpecjalizacjaDetailsQueryHandle(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IMapper _mapper;
+        public ChorobaLekListQueryHandle(IKlinikaContext klinikaContext, IHash hash, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
+            _mapper = mapper;
         }
 
         public async Task<List<GetChorobaResponse>> Handle(ChorobaLekListQuery req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_lek);
+            int id = _hash.Decode(req.ID_lek);
 
-            return (from x in context.ChorobaLeks
-                    join s in context.Chorobas on x.IdChoroba equals s.IdChoroba
-                    where x.IdLek == id
-                    orderby s.Nazwa
-                    select new GetChorobaResponse()
-                    {
-                        ID_Choroba = hash.Encode(x.IdChoroba),
-                        Nazwa = s.Nazwa,
-                        NazwaLacinska = s.NazwaLacinska,
-                        Opis = s.Opis
-                    }).ToList();
+            var data = await _context.ChorobaLeks
+                .Include(x => x.IdChorobaNavigation)
+                .Where(x => x.IdLek == id)
+                .OrderBy(x => x.IdChorobaNavigation.Nazwa)
+                .ToListAsync(cancellationToken);
+
+            return _mapper.Map<List<GetChorobaResponse>>(data);
         }
     }
 }

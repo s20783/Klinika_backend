@@ -1,7 +1,9 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using AutoMapper;
 using Domain;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using ServiceLayer.DTO.Responses;
 using System;
 using System.Collections.Generic;
@@ -20,35 +22,27 @@ namespace Application.Weterynarze.Queries
 
     public class WeterynarzListQueryHandler : IRequestHandler<WeterynarzListQuery, PaginatedResponse<GetWeterynarzListResponse>>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly ICache<GetWeterynarzListResponse> cache;
-        public WeterynarzListQueryHandler(IKlinikaContext klinikaContext, IHash _hash, ICache<GetWeterynarzListResponse> _cache)
+        private readonly IKlinikaContext _context;
+        private readonly ICache<GetWeterynarzListResponse> _cache;
+        private readonly IMapper _mapper;
+        public WeterynarzListQueryHandler(IKlinikaContext klinikaContext, IHash hash, ICache<GetWeterynarzListResponse> cache, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
-            cache = _cache;
+            _context = klinikaContext;
+            _cache = cache;
+            _mapper = mapper;
         }
 
         public async Task<PaginatedResponse<GetWeterynarzListResponse>> Handle(WeterynarzListQuery req, CancellationToken cancellationToken)
         {
-            List<GetWeterynarzListResponse> data = cache.GetFromCache();
+            List<GetWeterynarzListResponse> data = _cache.GetFromCache();
 
             if (data is null)
             {
-                data =
-                (from x in context.Osobas
-                 join y in context.Weterynarzs on x.IdOsoba equals y.IdOsoba into ps
-                 from p in ps
-                 select new GetWeterynarzListResponse()
-                 {
-                     IdOsoba = hash.Encode(x.IdOsoba),
-                     Imie = x.Imie,
-                     Nazwisko = x.Nazwisko,
-                     NumerTelefonu = x.NumerTelefonu,
-                     Email = x.Email,
-                     DataZatrudnienia = p.DataZatrudnienia
-                 }).AsParallel().WithCancellation(cancellationToken).ToList();
+                data = _mapper.Map<List<GetWeterynarzListResponse>>(await _context.Osobas
+                    .ToListAsync(cancellationToken)
+                    );
+
+                _cache.AddToCache(data);
             }
 
             var results = data

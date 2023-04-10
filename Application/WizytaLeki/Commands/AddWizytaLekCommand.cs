@@ -20,26 +20,26 @@ namespace Application.WizytaLeki.Commands
 
     public class AddWizytaLekCommandHandler : IRequestHandler<AddWizytaLekCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public AddWizytaLekCommandHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public AddWizytaLekCommandHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(AddWizytaLekCommand req, CancellationToken cancellationToken)
         {
-            (int id1, int id2) = hash.Decode(req.ID_wizyta, req.ID_Lek);
+            (int id1, int id2) = _hash.Decode(req.ID_wizyta, req.ID_Lek);
 
-            context.WizytaLeks.Add(new Domain.Models.WizytaLek
+            _context.WizytaLeks.Add(new Domain.Models.WizytaLek
             {
                 IdWizyta = id1,
                 IdLek = id2,
                 Ilosc = req.Ilosc
             });
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

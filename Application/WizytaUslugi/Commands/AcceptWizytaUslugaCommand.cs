@@ -1,15 +1,10 @@
 ﻿using Application.Interfaces;
 using Domain.Enums;
-using Domain.Models;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Transactions;
 
 namespace Application.WizytaUslugi.Commands
 {
@@ -20,32 +15,32 @@ namespace Application.WizytaUslugi.Commands
 
     public class AcceptWizytaUslugaCommandHandler : IRequestHandler<AcceptWizytaUslugaCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public AcceptWizytaUslugaCommandHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public AcceptWizytaUslugaCommandHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(AcceptWizytaUslugaCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_wizyta);
+            int id = _hash.Decode(req.ID_wizyta);
 
-            var wizyta = context.Wizyta.First(x => x.IdWizyta == id);
+            var wizyta = _context.Wizyta.First(x => x.IdWizyta == id);
 
             if (wizyta.CzyZaakceptowanaCena)
             {
                 throw new Exception();
             }
 
-            var klientZnizka = context.KlientZnizkas
+            var klientZnizka = _context.KlientZnizkas
                 //.Include(x => x.IdZnizkaNavigation)
                 .FirstOrDefault(x => x.IdOsoba.Equals(wizyta.IdOsoba) && x.CzyWykorzystana == false);
 
             if (klientZnizka != null)
             {
-                var znizka = context.Znizkas.First(x => x.IdZnizka == klientZnizka.IdZnizka);
+                var znizka = _context.Znizkas.First(x => x.IdZnizka == klientZnizka.IdZnizka);
                 wizyta.IdZnizka = znizka.IdZnizka;
                 wizyta.CenaZnizka = wizyta.Cena * (1 - (znizka.ProcentZnizki / 100));
                 klientZnizka.CzyWykorzystana = true;
@@ -54,7 +49,7 @@ namespace Application.WizytaUslugi.Commands
             wizyta.CzyZaakceptowanaCena = true;
             wizyta.Status = WizytaStatus.Zrealizowana.ToString();
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

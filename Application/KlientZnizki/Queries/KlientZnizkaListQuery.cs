@@ -17,26 +17,26 @@ namespace Application.KlientZnizki.Queries
 
     public class KlientZnizkaListQueryHandler : IRequestHandler<KlientZnizkaListQuery, List<GetKlientZnizkaResponse>>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public KlientZnizkaListQueryHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public KlientZnizkaListQueryHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<List<GetKlientZnizkaResponse>> Handle(KlientZnizkaListQuery req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_klient);
+            int id = _hash.Decode(req.ID_klient);
 
-            return (from x in context.Znizkas
-                    join y in context.KlientZnizkas on x.IdZnizka equals y.IdZnizka into ps
+            return (from x in _context.Znizkas
+                    join y in _context.KlientZnizkas on x.IdZnizka equals y.IdZnizka into ps
                     from p in ps
                     where p.IdOsoba == id
                     orderby p.DataPrzyznania
                     select new GetKlientZnizkaResponse()
                     {
-                        ID_Znizka = hash.Encode(x.IdZnizka),
+                        ID_Znizka = _hash.Encode(x.IdZnizka),
                         NazwaZnizki = x.NazwaZnizki,
                         ProcentZnizki = x.ProcentZnizki,
                         CzyWykorzystana = p.CzyWykorzystana

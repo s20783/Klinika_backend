@@ -1,12 +1,8 @@
 ﻿using Application.DTO.Request;
 using Application.DTO.Responses;
 using Application.Interfaces;
-using Domain.Models;
 using MediatR;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,28 +14,28 @@ namespace Application.Specjalizacje.Commands
         public SpecjalizacjaRequest request { get; set; }
     }
 
-    public class UpdateSpecjalizacjaCommandHandle : IRequestHandler<UpdateSpecjalizacjaCommand, int>
+    public class UpdateSpecjalizacjaCommandHandler : IRequestHandler<UpdateSpecjalizacjaCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly ICache<GetSpecjalizacjaResponse> cache;
-        public UpdateSpecjalizacjaCommandHandle(IKlinikaContext klinikaContext, IHash ihash, ICache<GetSpecjalizacjaResponse> _cache)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly ICache<GetSpecjalizacjaResponse> _cache;
+        public UpdateSpecjalizacjaCommandHandler(IKlinikaContext klinikaContext, IHash ihash, ICache<GetSpecjalizacjaResponse> cache)
         {
-            context = klinikaContext;
-            hash = ihash;
-            cache = _cache;
+            _context = klinikaContext;
+            _hash = ihash;
+            _cache = cache;
         }
 
         public async Task<int> Handle(UpdateSpecjalizacjaCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_specjalizacja);
+            int id = _hash.Decode(req.ID_specjalizacja);
 
-            var specjalizacja = context.Specjalizacjas.Where(x => x.IdSpecjalizacja == id).FirstOrDefault();
+            var specjalizacja = _context.Specjalizacjas.Where(x => x.IdSpecjalizacja == id).FirstOrDefault();
             specjalizacja.Nazwa = req.request.Nazwa;
             specjalizacja.Opis = req.request.Opis;
 
-            int result = await context.SaveChangesAsync(cancellationToken);
-            cache.Remove();
+            int result = await _context.SaveChangesAsync(cancellationToken);
+            _cache.Remove();
 
             return result;
         }

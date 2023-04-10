@@ -20,18 +20,18 @@ namespace Application.GodzinaPracy.Commands
 
     public class UpdateGodzinyPracyCommandHandle : IRequestHandler<UpdateGodzinyPracyCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public UpdateGodzinyPracyCommandHandle(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public UpdateGodzinyPracyCommandHandle(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(UpdateGodzinyPracyCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_osoba);
-            var list = context.GodzinyPracies.Where(x => x.IdOsoba == id).ToList();
+            int id = _hash.Decode(req.ID_osoba);
+            var list = _context.GodzinyPracies.Where(x => x.IdOsoba == id).ToList();
             if (!list.Any())
             {
                 throw new Exception("Ten pracownik nie ma ustawionych godzin pracy.");
@@ -57,7 +57,7 @@ namespace Application.GodzinaPracy.Commands
                 //}
             }
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

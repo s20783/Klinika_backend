@@ -1,6 +1,8 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,26 +19,24 @@ namespace Application.Konto.Queries
 
     public class GetKontoQueryHandle : IRequestHandler<KontoQuery, GetKontoResponse>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public GetKontoQueryHandle(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IMapper _mapper;
+        public GetKontoQueryHandle(IKlinikaContext klinikaContext, IHash hash, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
+            _mapper = mapper;
         }
 
         public async Task<GetKontoResponse> Handle(KontoQuery req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_osoba);
+            int id = _hash.Decode(req.ID_osoba);
 
-            return context.Osobas.Where(x => x.IdOsoba == id).Select(x => new GetKontoResponse()
-            {
-                Imie = x.Imie,
-                Nazwisko = x.Nazwisko,
-                NazwaUzytkownika = x.NazwaUzytkownika,
-                NumerTelefonu = x.NumerTelefonu,
-                Email = x.Email
-            }).FirstOrDefault();
+            return _mapper.Map<GetKontoResponse>(await _context.Osobas
+                .Where(x => x.IdOsoba == id)
+                .FirstOrDefaultAsync(cancellationToken)
+                );
         }
     }
 }

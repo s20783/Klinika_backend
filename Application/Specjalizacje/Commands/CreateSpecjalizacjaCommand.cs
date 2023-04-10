@@ -17,29 +17,28 @@ namespace Application.Specjalizacje.Commands
         public SpecjalizacjaRequest request { get; set; }
     }
 
-    public class CreateSpecjalizacjaCommandHandle : IRequestHandler<CreateSpecjalizacjaCommand, int>
+    public class CreateSpecjalizacjaCommandHandler : IRequestHandler<CreateSpecjalizacjaCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly ICache<GetSpecjalizacjaResponse> cache;
-        public CreateSpecjalizacjaCommandHandle(IKlinikaContext klinikaContext, IHash ihash, ICache<GetSpecjalizacjaResponse> _cache)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly ICache<GetSpecjalizacjaResponse> _cache;
+        public CreateSpecjalizacjaCommandHandler(IKlinikaContext klinikaContext, IHash ihash, ICache<GetSpecjalizacjaResponse> cache)
         {
-            context = klinikaContext;
-            hash = ihash;
-            cache = _cache;
+            _context = klinikaContext;
+            _hash = ihash;
+            _cache = cache;
         }
 
         public async Task<int> Handle(CreateSpecjalizacjaCommand req, CancellationToken cancellationToken)
         {
-            context.Specjalizacjas.Add(
-            new Specjalizacja
+            _context.Specjalizacjas.Add(new Specjalizacja
             {
                 Nazwa = req.request.Nazwa,
                 Opis = req.request.Opis
             });
 
-            int result = await context.SaveChangesAsync(cancellationToken);
-            cache.Remove();
+            int result = await _context.SaveChangesAsync(cancellationToken);
+            _cache.Remove();
 
             return result;
         }

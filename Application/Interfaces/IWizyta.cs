@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Application.Interfaces
 {
-    public interface IWizytaRepository
+    public interface IWizyta
     {
         bool IsWizytaAbleToCreate(List<Wizytum> wizytaList);
 

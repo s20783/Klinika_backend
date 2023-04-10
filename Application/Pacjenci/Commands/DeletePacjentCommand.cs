@@ -18,24 +18,24 @@ namespace Application.Pacjenci.Commands
     public class DeletePacjentCommandHandle : IRequestHandler<DeletePacjentCommand, int>
     {
         private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly ICache<GetPacjentListResponse> cache;
-        public DeletePacjentCommandHandle(IKlinikaContext klinikaContext, IHash ihash, ICache<GetPacjentListResponse> _cache)
+        private readonly IHash _hash;
+        private readonly ICache<GetPacjentListResponse> _cache;
+        public DeletePacjentCommandHandle(IKlinikaContext klinikaContext, IHash ihash, ICache<GetPacjentListResponse> cache)
         {
             context = klinikaContext;
-            hash = ihash;
-            cache = _cache;
+            _hash = ihash;
+            _cache = cache;
         }
 
         public async Task<int> Handle(DeletePacjentCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_Pacjent);
+            int id = _hash.Decode(req.ID_Pacjent);
 
             context.Szczepienies.RemoveRange(context.Szczepienies.Where(x => x.IdPacjent == id).ToList());
             context.Pacjents.Remove(context.Pacjents.Where(x => x.IdPacjent == id).First());
 
             int result = await context.SaveChangesAsync(cancellationToken);
-            cache.Remove();
+            _cache.Remove();
 
             return result;
         }

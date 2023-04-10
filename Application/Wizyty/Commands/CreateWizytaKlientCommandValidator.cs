@@ -2,9 +2,9 @@
 
 namespace Application.Wizyty.Commands
 {
-    public class UmowWizyteKlientCommandValidator : AbstractValidator<UmowWizyteKlientCommand>
+    public class CreateWizytaKlientCommandValidator : AbstractValidator<CreateWizytaKlientCommand>
     {
-        public UmowWizyteKlientCommandValidator()
+        public CreateWizytaKlientCommandValidator()
         {
             RuleFor(x => x.ID_Harmonogram).NotEmpty();
 

@@ -1,6 +1,8 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,30 +16,24 @@ namespace Application.Uslugi.Queries
 
     public class UslugaDetailsQueryHandler : IRequestHandler<UslugaDetailsQuery, GetUslugaResponse>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public UslugaDetailsQueryHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IMapper _mapper;
+        public UslugaDetailsQueryHandler(IKlinikaContext klinikaContext, IHash hash, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
+            _mapper = mapper;
         }
 
         public async Task<GetUslugaResponse> Handle(UslugaDetailsQuery req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_usluga);
-            
-            return (from x in context.Uslugas
-                    orderby x.NazwaUslugi
-                    where x.IdUsluga == id
-                    select new GetUslugaResponse()
-                    {
-                        ID_Usluga = req.ID_usluga,
-                        NazwaUslugi = x.NazwaUslugi,
-                        Opis = x.Opis,
-                        Cena = x.Cena,
-                        Narkoza = x.Narkoza,
-                        Dolegliwosc = x.Dolegliwosc
-                    }).First();
+            int id = _hash.Decode(req.ID_usluga);
+
+            return _mapper.Map<GetUslugaResponse>(_context.Uslugas
+                .Where(x => x.IdUsluga == id)
+                .FirstOrDefaultAsync(cancellationToken)
+                );
         }
     }
 }

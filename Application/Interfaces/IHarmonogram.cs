@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Application.Interfaces
 {
-    public interface IHarmonogramRepository
+    public interface IHarmonogram
     {
         int HarmonogramCount(GodzinyPracy godziny);
 

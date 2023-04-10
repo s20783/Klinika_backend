@@ -31,7 +31,7 @@ namespace Test.Mock
         public async Task AddWeterynarzSpecjalizacjaShouldBeCorrectTest()
         {
             var before = mockContext.Object.WeterynarzSpecjalizacjas.Count();
-            var handler = new AddSpecjalizacjaWeterynarzCommandHandle(mockContext.Object, hash);
+            var handler = new AddSpecjalizacjaWeterynarzCommandHandler(mockContext.Object, hash);
 
             AddSpecjalizacjaWeterynarzCommand command = new AddSpecjalizacjaWeterynarzCommand()
             {
@@ -48,7 +48,7 @@ namespace Test.Mock
         public async Task RemoveWeterynarzSpecjalizacjaShouldBeCorrectTest()
         {
             var before = mockContext.Object.WeterynarzSpecjalizacjas.Count();
-            var handler = new RemoveSpecjalizacjaWeterynarzCommandHandle(mockContext.Object, hash);
+            var handler = new RemoveSpecjalizacjaWeterynarzCommandHandler(mockContext.Object, hash);
 
             RemoveSpecjalizacjaWeterynarzCommand command = new RemoveSpecjalizacjaWeterynarzCommand()
             {
@@ -66,7 +66,7 @@ namespace Test.Mock
         public void RemoveWeterynarzSpecjalizacjaShouldThrowAnExceptionTest()
         {
             var before = mockContext.Object.WeterynarzSpecjalizacjas.Count();
-            var handler = new RemoveSpecjalizacjaWeterynarzCommandHandle(mockContext.Object, hash);
+            var handler = new RemoveSpecjalizacjaWeterynarzCommandHandler(mockContext.Object, hash);
 
             RemoveSpecjalizacjaWeterynarzCommand command = new RemoveSpecjalizacjaWeterynarzCommand()
             {

@@ -1,14 +1,9 @@
 ﻿using Application.Common.Exceptions;
 using Application.DTO.Requests;
 using Application.Interfaces;
-using Domain.Enums;
-using Domain.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,22 +18,22 @@ namespace Application.Wizyty.Commands
 
     public class UpdateWizytaInfoCommandHandler : IRequestHandler<UpdateWizytaInfoCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly IWizytaRepository wizytaRepository;
-        public UpdateWizytaInfoCommandHandler(IKlinikaContext klinikaContext, IHash _hash, IWizytaRepository _wizytaRepository)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IWizyta _wizyta;
+        public UpdateWizytaInfoCommandHandler(IKlinikaContext klinikaContext, IHash hash, IWizyta wizyta)
         {
-            context = klinikaContext;
-            hash = _hash;
-            wizytaRepository = _wizytaRepository;
+            _context = klinikaContext;
+            _hash = hash;
+            _wizyta = wizyta;
         }
 
         public async Task<int> Handle(UpdateWizytaInfoCommand req, CancellationToken cancellationToken)
         {
-            (int wizytaID, int weterynarzID) = hash.Decode(req.ID_wizyta, req.ID_weterynarz);
+            (int wizytaID, int weterynarzID) = _hash.Decode(req.ID_wizyta, req.ID_weterynarz);
 
-            var wizyta = context.Wizyta.Where(x => x.IdWizyta.Equals(wizytaID)).Include(x => x.Harmonograms).FirstOrDefault();
-            var harmonogram = context.Harmonograms.Where(x => x.IdWizyta == wizytaID).ToList();
+            var wizyta = _context.Wizyta.Where(x => x.IdWizyta.Equals(wizytaID)).Include(x => x.Harmonograms).FirstOrDefault();
+            var harmonogram = _context.Harmonograms.Where(x => x.IdWizyta == wizytaID).ToList();
 
             foreach (var h in harmonogram)
             {
@@ -61,9 +56,9 @@ namespace Application.Wizyty.Commands
             }*/
 
             wizyta.Opis = req.request.Opis;
-            wizyta.IdPacjent = req.request.ID_Pacjent != "0" ? hash.Decode(req.request.ID_Pacjent) : null;
+            wizyta.IdPacjent = req.request.ID_Pacjent != "0" ? _hash.Decode(req.request.ID_Pacjent) : null;
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

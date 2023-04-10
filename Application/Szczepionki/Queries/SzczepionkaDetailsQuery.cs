@@ -1,6 +1,8 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,30 +19,25 @@ namespace Application.Szczepionki.Queries
 
     public class SzczepionkaDetailsQueryHandler : IRequestHandler<SzczepionkaDetailsQuery, GetSzczepionkaResponse>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public SzczepionkaDetailsQueryHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IMapper _mapper;
+        public SzczepionkaDetailsQueryHandler(IKlinikaContext klinikaContext, IHash hash, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
+            _mapper = mapper;
         }
 
         public async Task<GetSzczepionkaResponse> Handle(SzczepionkaDetailsQuery req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_szczepionka);
+            int id = _hash.Decode(req.ID_szczepionka);
 
-            return (from x in context.Szczepionkas
-                    join y in context.Leks on x.IdLek equals y.IdLek
-                    where x.IdLek == id
-                    select new GetSzczepionkaResponse()
-                    {
-                        ID_lek = hash.Encode(y.IdLek),
-                        Nazwa = y.Nazwa,
-                        Producent = y.Producent,
-                        CzyObowiazkowa = x.CzyObowiazkowa,
-                        OkresWaznosci = x.OkresWaznosci != null ? TimeSpan.FromTicks((long)x.OkresWaznosci).Days : null,
-                        Zastosowanie = x.Zastosowanie
-                    }).First();
+            return _mapper.Map<GetSzczepionkaResponse>(await _context.Szczepionkas
+                .Include(x => x.IdLekNavigation)
+                .Where(x => x.IdLek == id)
+                .FirstOrDefaultAsync(cancellationToken)
+                );
         }
     }
 }

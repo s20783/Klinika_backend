@@ -11,7 +11,7 @@ using System.Transactions;
 
 namespace Application.Wizyty.Commands
 {
-    public class PrzelozWizyteCommand : IRequest<int>
+    public class UpdateWizytaDateCommand : IRequest<int>
     {
         public string ID_wizyta { get; set; }   //stare
         public string ID_klient { get; set; }
@@ -20,25 +20,25 @@ namespace Application.Wizyty.Commands
         public string Notatka { get; set; }
     }
 
-    public class PrzelozWizyteCommandHandler : IRequestHandler<PrzelozWizyteCommand, int>
+    public class PrzelozWizyteCommandHandler : IRequestHandler<UpdateWizytaDateCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly IWizytaRepository wizytaRepository;
-        public PrzelozWizyteCommandHandler(IKlinikaContext klinikaContext, IHash _hash, IWizytaRepository _wizytaRepository)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IWizyta _wizytaRepository;
+        public PrzelozWizyteCommandHandler(IKlinikaContext klinikaContext, IHash hash, IWizyta wizyta)
         {
-            context = klinikaContext;
-            hash = _hash;
-            wizytaRepository = _wizytaRepository;
+            _context = klinikaContext;
+            _hash = hash;
+            _wizytaRepository = wizyta;
         }
 
-        public async Task<int> Handle(PrzelozWizyteCommand req, CancellationToken cancellationToken)
+        public async Task<int> Handle(UpdateWizytaDateCommand req, CancellationToken cancellationToken)
         {
-            int wizytaID = hash.Decode(req.ID_wizyta);
-            int harmonogramID = hash.Decode(req.ID_harmonogram);
+            int wizytaID = _hash.Decode(req.ID_wizyta);
+            int harmonogramID = _hash.Decode(req.ID_harmonogram);
 
-            var wizyta = context.Wizyta.Where(x => x.IdWizyta.Equals(wizytaID)).First();
-            var oldHarmonograms = context.Harmonograms.Where(x => x.IdWizyta.Equals(wizytaID)).ToList();
+            var wizyta = _context.Wizyta.Where(x => x.IdWizyta.Equals(wizytaID)).First();
+            var oldHarmonograms = _context.Harmonograms.Where(x => x.IdWizyta.Equals(wizytaID)).ToList();
 
             if (!wizyta.Status.Equals(WizytaStatus.Zaplanowana.ToString()))
             {
@@ -55,8 +55,8 @@ namespace Application.Wizyty.Commands
                 throw new NotFoundException();
             }
 
-            (DateTime rozpoczecie, DateTime zakonczenie) = wizytaRepository.GetWizytaDates(oldHarmonograms);
-            if (!wizytaRepository.IsWizytaAbleToCancel(rozpoczecie))
+            (DateTime rozpoczecie, DateTime zakonczenie) = _wizytaRepository.GetWizytaDates(oldHarmonograms);
+            if (!_wizytaRepository.IsWizytaAbleToCancel(rozpoczecie))
             {
                 //naliczenie kary lub wysłanie powiadomienia
             }
@@ -92,13 +92,13 @@ namespace Application.Wizyty.Commands
                 newHarmonograms.ElementAt(i).IdWizyta = wizytaID;
             }*/
 
-            var harmonogram = context.Harmonograms.First(x => x.IdHarmonogram == harmonogramID);
+            var harmonogram = _context.Harmonograms.First(x => x.IdHarmonogram == harmonogramID);
             harmonogram.IdWizyta = wizytaID;
 
-            wizyta.IdPacjent = req.ID_pacjent != "0" ? hash.Decode(req.ID_pacjent) : null;
+            wizyta.IdPacjent = req.ID_pacjent != "0" ? _hash.Decode(req.ID_pacjent) : null;
             wizyta.NotatkaKlient = req.Notatka;
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

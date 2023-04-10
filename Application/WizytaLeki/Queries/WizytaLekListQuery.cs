@@ -1,6 +1,8 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,30 +19,25 @@ namespace Application.WizytaLeki.Queries
 
     public class WizytaLekListQueryHandler : IRequestHandler<WizytaLekListQuery, List<GetLekListResponse>>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public WizytaLekListQueryHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IMapper _mapper;
+        public WizytaLekListQueryHandler(IKlinikaContext klinikaContext, IHash hash, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
+            _mapper = mapper;
         }
 
         public async Task<List<GetLekListResponse>> Handle(WizytaLekListQuery req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_wizyta);
+            int id = _hash.Decode(req.ID_wizyta);
 
-            return (from x in context.Leks
-                    join y in context.WizytaLeks on x.IdLek equals y.IdLek
-                    orderby x.Nazwa
-                    where y.IdWizyta == id
-                    select new GetLekListResponse()
-                    {
-                        IdLek = hash.Encode(x.IdLek),
-                        Nazwa = x.Nazwa,
-                        JednostkaMiary = x.JednostkaMiary,
-                        Producent = x.Producent,
-                        Ilosc = y.Ilosc
-                    }).AsParallel().WithCancellation(cancellationToken).ToList();
+            return _mapper.Map<List<GetLekListResponse>>(await _context.WizytaLeks
+                .Include(x => x.IdLekNavigation)
+                .Where(x => x.IdWizyta == id)
+                .OrderBy(x => x.IdLekNavigation.Nazwa)
+                .ToListAsync(cancellationToken));
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.Interfaces
 {
-    public interface IPasswordRepository
+    public interface IPassword
     {
         public string HashPassword(byte[] salt, string plainPassword, int iterations);
         public byte[] GenerateSalt();

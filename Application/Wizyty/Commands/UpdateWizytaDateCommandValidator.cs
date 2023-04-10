@@ -2,9 +2,9 @@
 
 namespace Application.Wizyty.Commands
 {
-    public class PrzelozWizyteCommandValidator : AbstractValidator<PrzelozWizyteCommand>
+    public class UpdateWizytaDateCommandValidator : AbstractValidator<UpdateWizytaDateCommand>
     {
-        public PrzelozWizyteCommandValidator()
+        public UpdateWizytaDateCommandValidator()
         {
             RuleFor(x => x.ID_harmonogram).NotEmpty();
 

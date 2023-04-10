@@ -1,6 +1,7 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,24 +18,24 @@ namespace Application.Znizki.Queries
 
     public class SzczepionkaListQueryHandler : IRequestHandler<ZnizkaListQuery, List<GetZnizkaResponse>>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public SzczepionkaListQueryHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public SzczepionkaListQueryHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<List<GetZnizkaResponse>> Handle(ZnizkaListQuery req, CancellationToken cancellationToken)
         {
-            return (from x in context.Znizkas
+            return await (from x in _context.Znizkas
                     orderby x.NazwaZnizki
                     select new GetZnizkaResponse()
                     {
-                        ID_Znizka = hash.Encode(x.IdZnizka),
+                        ID_Znizka = _hash.Encode(x.IdZnizka),
                         NazwaZnizki = x.NazwaZnizki,
                         ProcentZnizki = x.ProcentZnizki
-                    }).ToList();
+                    }).ToListAsync(cancellationToken);
         }
     }
 }

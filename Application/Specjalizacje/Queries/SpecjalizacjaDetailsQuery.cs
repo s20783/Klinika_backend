@@ -1,6 +1,8 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,28 +17,26 @@ namespace Application.Specjalizacje.Queries
         public string ID_specjalizacja { get; set; }
     }
 
-    public class SpecjalizacjaDetailsQueryHandle : IRequestHandler<SpecjalizacjaDetailsQuery, GetSpecjalizacjaResponse>
+    public class SpecjalizacjaDetailsQueryHandler : IRequestHandler<SpecjalizacjaDetailsQuery, GetSpecjalizacjaResponse>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public SpecjalizacjaDetailsQueryHandle(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IMapper _mapper;
+        public SpecjalizacjaDetailsQueryHandler(IKlinikaContext klinikaContext, IHash hash, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
+            _mapper = mapper;
         }
 
         public async Task<GetSpecjalizacjaResponse> Handle(SpecjalizacjaDetailsQuery req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_specjalizacja);
+            int id = _hash.Decode(req.ID_specjalizacja);
 
-            return (from x in context.Specjalizacjas
-                    where x.IdSpecjalizacja == id
-                    select new GetSpecjalizacjaResponse()
-                    {
-                        IdSpecjalizacja = req.ID_specjalizacja,
-                        Nazwa = x.Nazwa,
-                        Opis = x.Opis
-                    }).FirstOrDefault();
+            return _mapper.Map<GetSpecjalizacjaResponse>(await _context.Specjalizacjas
+                    .Where(x => x.IdSpecjalizacja == id)
+                    .FirstOrDefaultAsync(cancellationToken)
+                    );
         }
     }
 }

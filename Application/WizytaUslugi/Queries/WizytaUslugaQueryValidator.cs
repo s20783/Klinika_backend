@@ -2,9 +2,9 @@
 
 namespace Application.WizytaUslugi.Queries
 {
-    public class WizytaUslugaKlientQueryValidator : AbstractValidator<WizytaUslugaKlientQuery>
+    public class WizytaUslugaQueryValidator : AbstractValidator<WizytaUslugaQuery>
     {
-        public WizytaUslugaKlientQueryValidator()
+        public WizytaUslugaQueryValidator()
         {
             RuleFor(x => x.ID_wizyta).NotEmpty();
         }

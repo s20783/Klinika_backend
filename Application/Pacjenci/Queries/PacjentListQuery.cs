@@ -1,7 +1,9 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using AutoMapper;
 using Domain;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using ServiceLayer.DTO.Responses;
 using System;
 using System.Collections.Generic;
@@ -20,38 +22,46 @@ namespace Application.Pacjenci.Queries
 
     public class GetPacjentListQueryHandle : IRequestHandler<PacjentListQuery, PaginatedResponse<GetPacjentListResponse>>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly ICache<GetPacjentListResponse> cache;
-        public GetPacjentListQueryHandle(IKlinikaContext klinikaContext, IHash _hash, ICache<GetPacjentListResponse> _cache)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly ICache<GetPacjentListResponse> _cache;
+        private readonly IMapper _mapper;
+        public GetPacjentListQueryHandle(IKlinikaContext klinikaContext, IHash hash, ICache<GetPacjentListResponse> cache, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
-            cache = _cache;
+            _context = klinikaContext;
+            _hash = hash;
+            _cache = cache;
+            _mapper = mapper;
         }
 
         public async Task<PaginatedResponse<GetPacjentListResponse>> Handle(PacjentListQuery req, CancellationToken cancellationToken)
         {
             List<GetPacjentListResponse> data;
-            data = cache.GetFromCache();
+            data = _cache.GetFromCache();
 
             if(data is null)
             {
-                data = (from x in context.Pacjents
-                        join y in context.Osobas on x.IdOsoba equals y.IdOsoba
+                data = _mapper.Map<List<GetPacjentListResponse>>(await _context.Pacjents
+                    .Include(x => x.IdOsobaNavigation)
+                    .ThenInclude(x => x.IdOsobaNavigation)
+                    .ToListAsync(cancellationToken)
+                    );
+
+                /*data = (from x in _context.Pacjents
+                        join y in _context.Osobas on x.IdOsoba equals y.IdOsoba
                         orderby x.Nazwa
                         select new GetPacjentListResponse()
                         {
-                            IdOsoba = hash.Encode(x.IdOsoba),
-                            IdPacjent = hash.Encode(x.IdPacjent),
+                            IdOsoba = _hash.Encode(x.IdOsoba),
+                            IdPacjent = _hash.Encode(x.IdPacjent),
                             Nazwa = x.Nazwa,
                             Gatunek = x.Gatunek,
                             Rasa = x.Rasa,
                             Plec = x.Plec,
                             Wlasciciel = y.Imie + ' ' + y.Nazwisko
-                        }).ToList();
+                        }).ToList();*/
 
-                cache.AddToCache(data);
+                _cache.AddToCache(data);
             }
 
             var results = data

@@ -17,26 +17,26 @@ namespace Application.Choroby.Commands
 
     public class DeleteChorobaCommandHandler : IRequestHandler<DeleteChorobaCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly ICache<GetChorobaResponse> cache;
-        public DeleteChorobaCommandHandler(IKlinikaContext klinikaContext, IHash ihash, ICache<GetChorobaResponse> _cache)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly ICache<GetChorobaResponse> _cache;
+        public DeleteChorobaCommandHandler(IKlinikaContext klinikaContext, IHash hash, ICache<GetChorobaResponse> cache)
         {
-            context = klinikaContext;
-            hash = ihash;
-            cache = _cache;
+            _context = klinikaContext;
+            _hash = hash;
+            _cache = cache;
         }
 
         public async Task<int> Handle(DeleteChorobaCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_Choroba);
+            int id = _hash.Decode(req.ID_Choroba);
 
-            context.ChorobaLeks.RemoveRange(context.ChorobaLeks.Where(x => x.IdChoroba.Equals(id)).ToList());
-            context.WizytaChorobas.RemoveRange(context.WizytaChorobas.Where(x => x.IdChoroba.Equals(id)).ToList());
-            context.Chorobas.Remove(context.Chorobas.Where(x => x.IdChoroba.Equals(id)).First());
+            _context.ChorobaLeks.RemoveRange(_context.ChorobaLeks.Where(x => x.IdChoroba.Equals(id)).ToList());
+            _context.WizytaChorobas.RemoveRange(_context.WizytaChorobas.Where(x => x.IdChoroba.Equals(id)).ToList());
+            _context.Chorobas.Remove(_context.Chorobas.Where(x => x.IdChoroba.Equals(id)).First());
 
-            int result = await context.SaveChangesAsync(cancellationToken);
-            cache.Remove();
+            int result = await _context.SaveChangesAsync(cancellationToken);
+            _cache.Remove();
 
             return result;
         }

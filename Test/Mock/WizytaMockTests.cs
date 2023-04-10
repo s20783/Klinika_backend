@@ -34,7 +34,7 @@ namespace Test.Mock
             var before = mockContext.Object.Wizyta.Count();
             var handler = new UmowWizyteKlientCommandHandler(mockContext.Object, hash, new WizytaService(), new MockEmailSender());
 
-            UmowWizyteKlientCommand command = new UmowWizyteKlientCommand()
+            CreateWizytaKlientCommand command = new CreateWizytaKlientCommand()
             {
                 ID_klient = hash.Encode(1),
                 ID_Harmonogram = hash.Encode(1),
@@ -54,7 +54,7 @@ namespace Test.Mock
         {
             var handler = new UmowWizyteKlientCommandHandler(mockContext.Object, hash, new WizytaService(), new MockEmailSender());
 
-            UmowWizyteKlientCommand command = new UmowWizyteKlientCommand()
+            CreateWizytaKlientCommand command = new CreateWizytaKlientCommand()
             {
                 ID_klient = hash.Encode(4),
                 ID_Harmonogram = hash.Encode(1),
@@ -112,7 +112,7 @@ namespace Test.Mock
         {
             var handler = new PrzelozWizyteCommandHandler(mockContext.Object, hash, new WizytaService());
 
-            PrzelozWizyteCommand command = new PrzelozWizyteCommand()
+            UpdateWizytaDateCommand command = new UpdateWizytaDateCommand()
             {
                 ID_klient = hash.Encode(1),
                 ID_wizyta = hash.Encode(1),
@@ -131,7 +131,7 @@ namespace Test.Mock
         {
             var handler = new PrzelozWizyteCommandHandler(mockContext.Object, hash, new WizytaService());
 
-            PrzelozWizyteCommand command = new PrzelozWizyteCommand()
+            UpdateWizytaDateCommand command = new UpdateWizytaDateCommand()
             {
                 ID_klient = hash.Encode(1),
                 ID_wizyta = hash.Encode(2),

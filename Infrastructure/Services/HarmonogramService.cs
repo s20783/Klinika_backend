@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Services
 {
-    public class HarmonogramService : IHarmonogramRepository
+    public class HarmonogramService : IHarmonogram
     {
         private readonly IEmailSender _emailSender;
         public HarmonogramService(IEmailSender sender)

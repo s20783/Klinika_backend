@@ -1,8 +1,10 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using AutoMapper;
 using Domain;
 using Domain.Enums;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using ServiceLayer.DTO.Responses;
 using System;
 using System.Collections.Generic;
@@ -21,36 +23,31 @@ namespace Application.Klienci.Queries
 
     public class KlientListQueryHandle : IRequestHandler<KlientListQuery, PaginatedResponse<GetKlientListResponse>>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly ICache<GetKlientListResponse> cache;
-        public KlientListQueryHandle(IKlinikaContext klinikaContext, IHash _hash, ICache<GetKlientListResponse> _cache)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly ICache<GetKlientListResponse> _cache;
+        private readonly IMapper _mapper;
+        public KlientListQueryHandle(IKlinikaContext klinikaContext, IHash hash, ICache<GetKlientListResponse> cache, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
-            cache = _cache;
+            _context = klinikaContext;
+            _hash = hash;
+            _cache = cache;
+            _mapper = mapper;
         }
 
         public async Task<PaginatedResponse<GetKlientListResponse>> Handle(KlientListQuery req, CancellationToken cancellationToken)
         {
-            List<GetKlientListResponse> data = cache.GetFromCache();
+            List<GetKlientListResponse> data = _cache.GetFromCache();
 
             if (data is null)
             {
-                data = (from x in context.Klients
-                        join y in context.Osobas on x.IdOsoba equals y.IdOsoba into ps
-                        from p in ps
-                        where p.IdRola == ((int)RolaEnum.Klient)
-                        select new GetKlientListResponse()
-                        {
-                            IdOsoba = hash.Encode(x.IdOsoba),
-                            Imie = p.Imie,
-                            Nazwisko = p.Nazwisko,
-                            NumerTelefonu = p.NumerTelefonu,
-                            Email = p.Email
-                        }).AsParallel().WithCancellation(cancellationToken).ToList();
+                data = _mapper.Map<List<GetKlientListResponse>>(await _context.Klients
+                    .Include(x => x.IdOsobaNavigation)
+                    .Where(x => x.IdOsobaNavigation.IdRola == ((int)RolaEnum.Klient))
+                    .ToListAsync(cancellationToken)
+                    );
 
-                cache.AddToCache(data);
+                _cache.AddToCache(data);
             }
 
             var results = data

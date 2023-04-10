@@ -32,7 +32,7 @@ namespace Test.Mock
         public async Task CreateUslugaShouldBeCorrectTest()
         {
             var before = mockContext.Object.Uslugas.Count();
-            var handler = new CreateUslugaCommandHandler(mockContext.Object, hash, new MemoryMockCache<GetUslugaResponse>());
+            var handler = new CreateUslugaCommandHandler(mockContext.Object, new MemoryMockCache<GetUslugaResponse>());
 
             var command = new CreateUslugaCommand()
             {

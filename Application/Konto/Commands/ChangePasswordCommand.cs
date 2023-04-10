@@ -18,34 +18,34 @@ namespace Application.Konto.Commands
 
     public class ChangePasswordCommandHandle : IRequestHandler<ChangePasswordCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IPasswordRepository passwordRepository;
-        private readonly IConfiguration configuration;
-        private readonly IHash hash;
-        private readonly ILoginRepository loginRepository;
-        public ChangePasswordCommandHandle(IKlinikaContext klinikaContext, IPasswordRepository password, IConfiguration config, IHash _hash, ILoginRepository login)
+        private readonly IKlinikaContext _context;
+        private readonly IPassword _passwordRepository;
+        private readonly IConfiguration _configuration;
+        private readonly IHash _hash;
+        private readonly ILogin _loginRepository;
+        public ChangePasswordCommandHandle(IKlinikaContext klinikaContext, IPassword password, IConfiguration config, IHash hash, ILogin login)
         {
-            context = klinikaContext;
-            passwordRepository = password;
-            configuration = config;
-            hash = _hash;
-            loginRepository = login;
+            _context = klinikaContext;
+            _passwordRepository = password;
+            _configuration = config;
+            _hash = hash;
+            _loginRepository = login;
         }
 
         public async Task<int> Handle(ChangePasswordCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_osoba);
+            int id = _hash.Decode(req.ID_osoba);
 
-            var user = context.Osobas.Where(x => x.IdOsoba == id).FirstOrDefault();
-            if(!loginRepository.CheckCredentails(user, passwordRepository, req.request.CurrentHaslo, int.Parse(configuration["PasswordIterations"]))){
-                await context.SaveChangesAsync(cancellationToken);
+            var user = _context.Osobas.Where(x => x.IdOsoba == id).FirstOrDefault();
+            if(!_loginRepository.CheckCredentails(user, _passwordRepository, req.request.CurrentHaslo, int.Parse(_configuration["PasswordIterations"]))){
+                await _context.SaveChangesAsync(cancellationToken);
                 throw new UserNotAuthorizedException("Incorrect password");
             }
 
-            string hashedPassword = passwordRepository.HashPassword(Convert.FromBase64String(user.Salt), req.request.NewHaslo, int.Parse(configuration["PasswordIterations"]));
+            string hashedPassword = _passwordRepository.HashPassword(Convert.FromBase64String(user.Salt), req.request.NewHaslo, int.Parse(_configuration["PasswordIterations"]));
             user.Haslo = hashedPassword;
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

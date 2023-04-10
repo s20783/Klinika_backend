@@ -1,7 +1,9 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using AutoMapper;
 using Domain;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using ServiceLayer.DTO.Responses;
 using System;
 using System.Collections.Generic;
@@ -20,37 +22,29 @@ namespace Application.Szczepionki.Queries
 
     public class SzczepionkaListQueryHandler : IRequestHandler<SzczepionkaListQuery, PaginatedResponse<GetSzczepionkaResponse>>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public SzczepionkaListQueryHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IMapper _mapper;
+        public SzczepionkaListQueryHandler(IKlinikaContext klinikaContext, IHash hash, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
+            _mapper = mapper;
         }
 
         public async Task<PaginatedResponse<GetSzczepionkaResponse>> Handle(SzczepionkaListQuery req, CancellationToken cancellationToken)
-        {
-            var data = (from x in context.Szczepionkas
-                    join y in context.Leks on x.IdLek equals y.IdLek
-                    orderby y.Nazwa
-                    select new GetSzczepionkaResponse()
-                    {
-                        ID_lek = hash.Encode(y.IdLek),
-                        Nazwa = y.Nazwa,
-                        Producent = y.Producent,
-                        CzyObowiazkowa = x.CzyObowiazkowa,
-                        OkresWaznosci = x.OkresWaznosci != null ? TimeSpan.FromTicks((long)x.OkresWaznosci).Days : null,
-                        Zastosowanie = x.Zastosowanie
-                    }).ToList();
-
-            var results = data
+        {     
+            var results = _mapper.Map<List<GetSzczepionkaResponse>>(await _context.Szczepionkas
+                .Include(x => x.IdLekNavigation)
                 .Where(
                 x => req.SearchWord == null ||
-                x.Nazwa.ToLower().Contains(req.SearchWord.ToLower()) ||
+                x.IdLekNavigation.Nazwa.ToLower().Contains(req.SearchWord.ToLower()) ||
                 x.Zastosowanie.ToLower().Contains(req.SearchWord.ToLower()) ||
-                x.Producent.ToLower().Contains(req.SearchWord.ToLower())
+                x.IdLekNavigation.Producent.ToLower().Contains(req.SearchWord.ToLower())
                 )
-                .OrderBy(x => x.Nazwa);
+                .OrderBy(x => x.IdLekNavigation.Nazwa)
+                .ToListAsync(cancellationToken)
+                );
 
             return new PaginatedResponse<GetSzczepionkaResponse>
             {

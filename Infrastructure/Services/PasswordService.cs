@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Services
 {
-    public class PasswordService : IPasswordRepository
+    public class PasswordService : IPassword
     {
         public string HashPassword(byte[] salt, string plainPassword, int iterations)
         {

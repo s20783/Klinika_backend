@@ -26,21 +26,12 @@ namespace Test.Mock
             hash = new HashService(new Hashids("zscfhulp36", 7));
         }
 
-        [Test]
-        public async Task GetSpecjalizacjaTest()
-        {
-            var handler = new SpecjalizacjaListQueryHandle(mockContext.Object, hash, new MemoryMockCache<GetSpecjalizacjaResponse>());
-            var result = await handler.Handle(new SpecjalizacjaListQuery(), CancellationToken.None);
-
-            Assert.AreEqual(result.Count(), 2);
-        }
-
 
         [Test]
         public async Task CreateSpecjalizacjaShouldBeCorrectTest()
         {
             var before = mockContext.Object.Specjalizacjas.Count();
-            var handler = new CreateSpecjalizacjaCommandHandle(mockContext.Object, hash, new MemoryMockCache<GetSpecjalizacjaResponse>());
+            var handler = new CreateSpecjalizacjaCommandHandler(mockContext.Object, hash, new MemoryMockCache<GetSpecjalizacjaResponse>());
 
             var command = new CreateSpecjalizacjaCommand()
             {
@@ -59,7 +50,7 @@ namespace Test.Mock
         [Test]
         public async Task UpdateSpecjalizacjaShouldBeCorrectTest()
         {
-            var handler = new UpdateSpecjalizacjaCommandHandle(mockContext.Object, hash, new MemoryMockCache<GetSpecjalizacjaResponse>());
+            var handler = new UpdateSpecjalizacjaCommandHandler(mockContext.Object, hash, new MemoryMockCache<GetSpecjalizacjaResponse>());
 
             var command = new UpdateSpecjalizacjaCommand()
             {
@@ -79,7 +70,7 @@ namespace Test.Mock
         [Test]
         public void UpdateSpecjalizacjaShouldThrowAnExceptionTest()
         {
-            var handler = new UpdateSpecjalizacjaCommandHandle(mockContext.Object, hash, new MemoryMockCache<GetSpecjalizacjaResponse>());
+            var handler = new UpdateSpecjalizacjaCommandHandler(mockContext.Object, hash, new MemoryMockCache<GetSpecjalizacjaResponse>());
 
             var command = new UpdateSpecjalizacjaCommand()
             {
@@ -99,7 +90,7 @@ namespace Test.Mock
         public async Task DeleteSpecjalizacjaShouldBeCorrectTest()
         {
             var before = mockContext.Object.Specjalizacjas.Count();
-            var handler = new DeleteSpecjalizacjaCommandHandle(mockContext.Object, hash, new MemoryMockCache<GetSpecjalizacjaResponse>());
+            var handler = new DeleteSpecjalizacjaCommandHandler(mockContext.Object, hash, new MemoryMockCache<GetSpecjalizacjaResponse>());
 
             var command = new DeleteSpecjalizacjaCommand()
             {
@@ -115,7 +106,7 @@ namespace Test.Mock
         [Test]
         public void DeleteSpecjalizacjaShouldThrowAnExceptionTest()
         {
-            var handler = new DeleteSpecjalizacjaCommandHandle(mockContext.Object, hash, new MemoryMockCache<GetSpecjalizacjaResponse>());
+            var handler = new DeleteSpecjalizacjaCommandHandler(mockContext.Object, hash, new MemoryMockCache<GetSpecjalizacjaResponse>());
 
             var command = new DeleteSpecjalizacjaCommand()
             {

@@ -19,26 +19,26 @@ namespace Application.GodzinaPracy.Commands
 
     public class DeleteGodzinyPracyCommandHandle : IRequestHandler<DeleteGodzinyPracyCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public DeleteGodzinyPracyCommandHandle(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public DeleteGodzinyPracyCommandHandle(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(DeleteGodzinyPracyCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_osoba);
-            var godzinyPracy = context.GodzinyPracies.Where(x => x.DzienTygodnia == req.dzien && x.IdOsoba == id).FirstOrDefault();
+            int id = _hash.Decode(req.ID_osoba);
+            var godzinyPracy = _context.GodzinyPracies.Where(x => x.DzienTygodnia == req.dzien && x.IdOsoba == id).FirstOrDefault();
             if (godzinyPracy == null)
             {
                 throw new Exception("Ten pracownik nie ma ustawionych godzin pracy.");
             }
 
-            context.GodzinyPracies.Remove(godzinyPracy);
+            _context.GodzinyPracies.Remove(godzinyPracy);
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

@@ -16,20 +16,20 @@ namespace Application.Szczepionki.Commands
 
     public class UpdateSzczepionkaCommandHandler : IRequestHandler<UpdateSzczepionkaCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public UpdateSzczepionkaCommandHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public UpdateSzczepionkaCommandHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(UpdateSzczepionkaCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_szczepionka);
+            int id = _hash.Decode(req.ID_szczepionka);
 
-            var lek = context.Leks.Where(x => x.IdLek.Equals(id)).First();
-            var szczepionka = context.Szczepionkas.Where(x => x.IdLek.Equals(id)).First();
+            var lek = _context.Leks.Where(x => x.IdLek.Equals(id)).First();
+            var szczepionka = _context.Szczepionkas.Where(x => x.IdLek.Equals(id)).First();
 
             lek.Nazwa = req.request.Nazwa;
             lek.Producent = req.request.Producent;
@@ -37,7 +37,7 @@ namespace Application.Szczepionki.Commands
             szczepionka.OkresWaznosci = req.request.OkresWaznosci != null ? TimeSpan.FromDays((double)req.request.OkresWaznosci).Ticks : null;
             szczepionka.CzyObowiazkowa = req.request.CzyObowiazkowa;
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

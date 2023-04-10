@@ -5,9 +5,7 @@ using Domain.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,26 +19,26 @@ namespace Application.Wizyty.Commands
 
     public class DeleteWizytaKlientCommandHandler : IRequestHandler<DeleteWizytaKlientCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly IWizytaRepository wizytaRepository;
-        private readonly IEmailSender sender;
-        public DeleteWizytaKlientCommandHandler(IKlinikaContext klinikaContext, IHash _hash, IWizytaRepository _wizytaRepository, IEmailSender emailSender)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IWizyta _wizyta;
+        private readonly IEmailSender _sender;
+        public DeleteWizytaKlientCommandHandler(IKlinikaContext klinikaContext, IHash hash, IWizyta wizyta, IEmailSender emailSender)
         {
-            context = klinikaContext;
-            hash = _hash;
-            wizytaRepository = _wizytaRepository;
-            sender = emailSender;
+            _context = klinikaContext;
+            _hash = hash;
+            _wizyta = wizyta;
+            _sender = emailSender;
         }
 
         public async Task<int> Handle(DeleteWizytaKlientCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_wizyta);
-            int klientID = hash.Decode(req.ID_klient);
+            int id = _hash.Decode(req.ID_wizyta);
+            int klientID = _hash.Decode(req.ID_klient);
 
             //var harmonograms = context.Harmonograms.Where(x => x.IdWizyta.Equals(id)).OrderBy(x => x.DataRozpoczecia).ToList();
-            var wizyta = context.Wizyta.Where(x => x.IdWizyta.Equals(id)).Include(x => x.Harmonograms).FirstOrDefault();
-            var harmonograms = context.Harmonograms.Where(x => x.IdWizyta.Equals(id)).OrderBy(x => x.DataRozpoczecia).ToList();
+            var wizyta = _context.Wizyta.Where(x => x.IdWizyta.Equals(id)).Include(x => x.Harmonograms).FirstOrDefault();
+            var harmonograms = _context.Harmonograms.Where(x => x.IdWizyta.Equals(id)).OrderBy(x => x.DataRozpoczecia).ToList();
 
             if (!((WizytaStatus)Enum.Parse(typeof(WizytaStatus), wizyta.Status, true)).Equals(WizytaStatus.Zaplanowana))
             {
@@ -57,9 +55,9 @@ namespace Application.Wizyty.Commands
                 throw new NotFoundException();
             }
 
-            (DateTime rozpoczecie, DateTime zakonczenie) = wizytaRepository.GetWizytaDates(harmonograms);
+            (DateTime rozpoczecie, DateTime zakonczenie) = _wizyta.GetWizytaDates(harmonograms);
 
-            if (!wizytaRepository.IsWizytaAbleToCancel(rozpoczecie))
+            if (!_wizyta.IsWizytaAbleToCancel(rozpoczecie))
             {
                 //naliczenie kary lub wysłanie powiadomienia
             }
@@ -70,11 +68,11 @@ namespace Application.Wizyty.Commands
             }
 
             wizyta.Status = WizytaStatus.AnulowanaKlient.ToString();
-            var result = await context.SaveChangesAsync(cancellationToken);
+            var result = await _context.SaveChangesAsync(cancellationToken);
 
             //wysłanie maila z potwierdzeniem anulowania wizyty
-            var to = context.Osobas.Where(x => x.IdOsoba.Equals(klientID)).First().Email;
-            await sender.SendAnulujWizyteEmail(to, harmonograms.ElementAt(0).DataRozpoczecia);
+            var to = _context.Osobas.Where(x => x.IdOsoba.Equals(klientID)).First().Email;
+            await _sender.SendAnulujWizyteEmail(to, harmonograms.ElementAt(0).DataRozpoczecia);
 
             return result;
         }

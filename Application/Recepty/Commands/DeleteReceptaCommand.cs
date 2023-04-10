@@ -16,21 +16,21 @@ namespace Application.Recepty.Commands
 
     public class DeleteReceptaCommandHandler : IRequestHandler<DeleteReceptaCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public DeleteReceptaCommandHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public DeleteReceptaCommandHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(DeleteReceptaCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_recepta);
+            int id = _hash.Decode(req.ID_recepta);
 
-            context.ReceptaLeks.RemoveRange(context.ReceptaLeks.Where(x => x.IdWizyta.Equals(id)).ToList());
-            context.Recepta.Remove(context.Recepta.Where(x => x.IdWizyta.Equals(id)).First());
-            return await context.SaveChangesAsync(cancellationToken);
+            _context.ReceptaLeks.RemoveRange(_context.ReceptaLeks.Where(x => x.IdWizyta.Equals(id)).ToList());
+            _context.Recepta.Remove(_context.Recepta.Where(x => x.IdWizyta.Equals(id)).First());
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

@@ -15,25 +15,25 @@ namespace Application.Leki.Commands
 
     public class CreateLekCommandHandler : IRequestHandler<CreateLekCommand, string>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public CreateLekCommandHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public CreateLekCommandHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<string> Handle(CreateLekCommand req, CancellationToken cancellationToken)
         {
-            var result = context.Leks.Add(new Lek
+            var result = _context.Leks.Add(new Lek
             {
                 Nazwa = req.request.Nazwa,
                 JednostkaMiary = req.request.JednostkaMiary,
                 Producent = req.request.Producent
             });
 
-            await context.SaveChangesAsync(cancellationToken);
-            return result != null ? hash.Encode(result.Entity.IdLek) : "";
+            await _context.SaveChangesAsync(cancellationToken);
+            return result != null ? _hash.Encode(result.Entity.IdLek) : string.Empty;
         }
     }
 }

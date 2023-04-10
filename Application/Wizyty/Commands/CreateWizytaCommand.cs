@@ -22,30 +22,30 @@ namespace Application.Wizyty.Commands
 
     public class CreateWizytaCommandHandler : IRequestHandler<CreateWizytaCommand, string>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly IWizytaRepository wizytaRepository;
-        public CreateWizytaCommandHandler(IKlinikaContext klinikaContext, IHash _hash, IWizytaRepository _wizytaRepository)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IWizyta _wizyta;
+        public CreateWizytaCommandHandler(IKlinikaContext klinikaContext, IHash hash, IWizyta wizyta)
         {
-            context = klinikaContext;
-            hash = _hash;
-            wizytaRepository = _wizytaRepository;
+            _context = klinikaContext;
+            _hash = hash;
+            _wizyta = wizyta;
         }
 
         public async Task<string> Handle(CreateWizytaCommand req, CancellationToken cancellationToken)
         {
-            var harmonogramID = hash.Decode(req.ID_harmonogram);
-            var klientID = hash.Decode(req.ID_klient);
+            var harmonogramID = _hash.Decode(req.ID_harmonogram);
+            var klientID = _hash.Decode(req.ID_klient);
             var id = 0;
 
             using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 try
                 {
-                    var result = context.Wizyta.Add(new Wizytum
+                    var result = _context.Wizyta.Add(new Wizytum
                     {
                         IdOsoba = klientID,
-                        IdPacjent = req.ID_pacjent != "0" ? hash.Decode(req.ID_pacjent) : null,
+                        IdPacjent = req.ID_pacjent != "0" ? _hash.Decode(req.ID_pacjent) : null,
                         Opis = "",
                         Status = WizytaStatus.Zaplanowana.ToString(),
                         Cena = 0,
@@ -53,23 +53,23 @@ namespace Application.Wizyty.Commands
                         CzyZaakceptowanaCena = false
                     });
 
-                    await context.SaveChangesAsync(cancellationToken);
+                    await _context.SaveChangesAsync(cancellationToken);
 
                     id = result != null ? result.Entity.IdWizyta : 0;
-                    var harmonogram = context.Harmonograms.First(x => x.IdHarmonogram == harmonogramID);
+                    var harmonogram = _context.Harmonograms.First(x => x.IdHarmonogram == harmonogramID);
                     harmonogram.IdWizyta = id;
 
-                    await context.SaveChangesAsync(cancellationToken);
+                    await _context.SaveChangesAsync(cancellationToken);
                     transaction.Complete();
                 }
                 catch (Exception e)
                 {
                     transaction.Dispose();
-                    throw e;
+                    throw new Exception(e.Message);
                 }
 
                 transaction.Dispose();
-                return hash.Encode(id);
+                return _hash.Encode(id);
             }
         }
     }

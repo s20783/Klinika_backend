@@ -2,9 +2,9 @@
 
 namespace Application.ReceptaLeki.Commands
 {
-    public class CreateReceptaLekCommandValidator : AbstractValidator<CreateReceptaLekCommand>
+    public class AddReceptaLekCommandValidator : AbstractValidator<AddReceptaLekCommand>
     {
-        public CreateReceptaLekCommandValidator()
+        public AddReceptaLekCommandValidator()
         {
             RuleFor(x => x.ID_Recepta).NotEmpty();
 

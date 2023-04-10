@@ -22,39 +22,37 @@ namespace Application.Klienci.Commands
 
     public class CreateWeterynarzCommandHandler : IRequestHandler<CreateKlientKlinikaCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IPasswordRepository passwordRepository;
-        private readonly IConfiguration configuration;
-        private readonly IHash hash;
-        private readonly IEmailSender emailSender;
-        private readonly ICache<GetKlientListResponse> cache;
-        public CreateWeterynarzCommandHandler(IKlinikaContext klinikaContext, IPasswordRepository password, IConfiguration config, IHash _hash, IEmailSender sender, ICache<GetKlientListResponse> _cache)
+        private readonly IKlinikaContext _context;
+        private readonly IPassword _passwordRepository;
+        private readonly IConfiguration _configuration;
+        private readonly IEmailSender _emailSender;
+        private readonly ICache<GetKlientListResponse> _cache;
+        public CreateWeterynarzCommandHandler(IKlinikaContext klinikaContext, IPassword password, IConfiguration config, IEmailSender sender, ICache<GetKlientListResponse> cache)
         {
-            context = klinikaContext;
-            passwordRepository = password;
-            configuration = config;
-            hash = _hash;
-            emailSender = sender;
-            cache = _cache;
+            _context = klinikaContext;
+            _passwordRepository = password;
+            _configuration = config;
+            _emailSender = sender;
+            _cache = cache;
         }
 
         public async Task<int> Handle(CreateKlientKlinikaCommand req, CancellationToken cancellationToken)
         {
-            var generatedLogin = "Klient" + (context.Osobas.Max(x => x.IdOsoba) + 1);
+            var generatedLogin = "Klient" + (_context.Osobas.Max(x => x.IdOsoba) + 1);
 
-            if (context.Osobas.Where(x => x.NazwaUzytkownika.Equals(generatedLogin)).Any())
+            if (_context.Osobas.Where(x => x.NazwaUzytkownika.Equals(generatedLogin)).Any())
             {
                 throw new Exception("Not unique");
             }
 
-            var generatedPassword = passwordRepository.GetRandomPassword(8);
-            byte[] salt = passwordRepository.GenerateSalt();
-            var hashedPassword = passwordRepository.HashPassword(salt, generatedPassword, int.Parse(configuration["PasswordIterations"]));
+            var generatedPassword = _passwordRepository.GetRandomPassword(8);
+            byte[] salt = _passwordRepository.GenerateSalt();
+            var hashedPassword = _passwordRepository.HashPassword(salt, generatedPassword, int.Parse(_configuration["PasswordIterations"]));
             string saltBase64 = Convert.ToBase64String(salt);
 
             var query = "exec DodajKlienta @imie, @nazwisko, @numerTel, @email, @login, @haslo, @salt";
 
-            SqlConnection connection = new SqlConnection(configuration.GetConnectionString("KlinikaDatabase"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("KlinikaDatabase"));
             await connection.OpenAsync();
             SqlCommand command = new SqlCommand(query, connection);
             command.Parameters.AddWithValue("@imie", req.request.Imie);
@@ -67,8 +65,8 @@ namespace Application.Klienci.Commands
 
             command.ExecuteScalar();
             await connection.CloseAsync();
-            await emailSender.SendCreateAccountEmail(req.request.Email);
-            cache.Remove();
+            await _emailSender.SendCreateAccountEmail(req.request.Email);
+            _cache.Remove();
             return 0;
         }
     }

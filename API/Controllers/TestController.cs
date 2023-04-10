@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Infrastructure.Models;
 using Application.Interfaces;
 using System.Net.Mail;
 using System.Net;
@@ -18,13 +17,15 @@ using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using PRO_API.Common;
 using Domain.Enums;
 using System.Collections.Generic;
+using Infrastructure;
+using Org.BouncyCastle.Ocsp;
 
 namespace PRO_API.Controllers
 {
     public class TestController : ApiControllerBase
     {
         private readonly IConfiguration configuration;
-        private readonly IHashids hashids;
+        private readonly IHashids _hash;
         private readonly KlinikaContext context;
         private readonly IEmailSender _emailSender;
         private readonly ILogger<TestController> logger;
@@ -32,7 +33,7 @@ namespace PRO_API.Controllers
         {
             _emailSender = emailSender;
             configuration = config;
-            hashids = ihashids;
+            _hash = ihashids;
             context = klinikaContext;
             logger = _logger;
         }
@@ -43,20 +44,12 @@ namespace PRO_API.Controllers
         {
             try
             {
-                var roles = new List<RolaEnum>
-                {
-                    RolaEnum.Klient,
-                    RolaEnum.Weterynarz
-                };
-                var Roles = string.Join(",", Array.ConvertAll(roles.ToArray(), x => Enum.GetName(typeof(RolaEnum), x)));
-
-                return Ok(Roles);
+                return Ok();
             }
             catch (Exception e)
             {
                 return Ok(e.Message);
             }
         }
-
     }
 }

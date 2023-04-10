@@ -18,25 +18,25 @@ namespace Application.Wizyty.Commands
 
     public class DeleteWizytaAdminCommandHandler : IRequestHandler<DeleteWizytaAdminCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly IWizytaRepository wizytaRepository;
-        private readonly IEmailSender sender;
-        public DeleteWizytaAdminCommandHandler(IKlinikaContext klinikaContext, IHash _hash, IWizytaRepository _wizytaRepository, IEmailSender emailSender)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IWizyta _wizyta;
+        private readonly IEmailSender _sender;
+        public DeleteWizytaAdminCommandHandler(IKlinikaContext klinikaContext, IHash hash, IWizyta wizyta, IEmailSender emailSender)
         {
-            context = klinikaContext;
-            hash = _hash;
-            wizytaRepository = _wizytaRepository;
-            sender = emailSender;
+            _context = klinikaContext;
+            _hash = hash;
+            _wizyta = wizyta;
+            _sender = emailSender;
         }
 
         public async Task<int> Handle(DeleteWizytaAdminCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_wizyta);
+            int id = _hash.Decode(req.ID_wizyta);
 
             //var harmonograms = context.Harmonograms.Where(x => x.IdWizyta.Equals(id)).OrderBy(x => x.DataRozpoczecia).ToList();
-            var wizyta = context.Wizyta.Where(x => x.IdWizyta.Equals(id)).FirstOrDefault();
-            var harmonograms = context.Harmonograms.Where(x => x.IdWizyta == id).OrderBy(x => x.DataRozpoczecia).ToList();
+            var wizyta = _context.Wizyta.Where(x => x.IdWizyta.Equals(id)).FirstOrDefault();
+            var harmonograms = _context.Harmonograms.Where(x => x.IdWizyta == id).OrderBy(x => x.DataRozpoczecia).ToList();
 
             if (!((WizytaStatus)Enum.Parse(typeof(WizytaStatus), wizyta.Status, true)).Equals(WizytaStatus.Zaplanowana))
             {
@@ -54,11 +54,11 @@ namespace Application.Wizyty.Commands
             }
 
             wizyta.Status = WizytaStatus.AnulowanaKlinika.ToString();
-            await context.SaveChangesAsync(cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
 
             //wysłanie maila z potwierdzeniem anulowania wizyty do klienta
-            var to = context.Osobas.Where(x => x.IdOsoba.Equals(wizyta.IdOsoba)).First().Email;
-            await sender.SendAnulujWizyteEmail(to, harmonograms.First().DataRozpoczecia);
+            var to = _context.Osobas.Where(x => x.IdOsoba.Equals(wizyta.IdOsoba)).First().Email;
+            await _sender.SendAnulujWizyteEmail(to, harmonograms.First().DataRozpoczecia);
 
             return 0;
         }

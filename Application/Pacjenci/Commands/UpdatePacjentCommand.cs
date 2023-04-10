@@ -17,27 +17,27 @@ namespace Application.Pacjenci.Commands
 
     public class UpdatePacjentCommandHandle : IRequestHandler<UpdatePacjentCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly ICache<GetPacjentListResponse> cache;
-        public UpdatePacjentCommandHandle(IKlinikaContext klinikaContext, IHash ihash, ICache<GetPacjentListResponse> _cache)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly ICache<GetPacjentListResponse> _cache;
+        public UpdatePacjentCommandHandle(IKlinikaContext klinikaContext, IHash ihash, ICache<GetPacjentListResponse> cache)
         {
-            context = klinikaContext;
-            hash = ihash;
-            cache = _cache;
+            _context = klinikaContext;
+            _hash = ihash;
+            _cache = cache;
         }
 
         public async Task<int> Handle(UpdatePacjentCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_pacjent);
+            int id = _hash.Decode(req.ID_pacjent);
 
-            var pacjent = context.Pacjents.Where(x => x.IdPacjent == id).FirstOrDefault();
+            var pacjent = _context.Pacjents.Where(x => x.IdPacjent == id).FirstOrDefault();
             if (pacjent is null)
             {
                 throw new Exception();
             }
 
-            pacjent.IdOsoba = hash.Decode(req.request.IdOsoba);
+            pacjent.IdOsoba = _hash.Decode(req.request.IdOsoba);
             pacjent.Nazwa = req.request.Nazwa;
             pacjent.Gatunek = req.request.Gatunek;
             pacjent.Rasa = req.request.Rasa;
@@ -48,8 +48,8 @@ namespace Application.Pacjenci.Commands
             pacjent.Agresywne = req.request.Agresywne;
             pacjent.Ubezplodnienie = req.request.Ubezplodnienie;
 
-            int result = await context.SaveChangesAsync(cancellationToken);
-            cache.Remove();
+            int result = await _context.SaveChangesAsync(cancellationToken);
+            _cache.Remove();
 
             return result;
         }

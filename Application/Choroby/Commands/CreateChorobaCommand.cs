@@ -17,32 +17,32 @@ namespace Application.Choroby.Commands
 
     public class CreateChorobaCommandHandler : IRequestHandler<CreateChorobaCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly ICache<GetChorobaResponse> cache;
-        public CreateChorobaCommandHandler(IKlinikaContext klinikaContext, IHash ihash, ICache<GetChorobaResponse> _cache)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly ICache<GetChorobaResponse> _cache;
+        public CreateChorobaCommandHandler(IKlinikaContext klinikaContext, IHash hash, ICache<GetChorobaResponse> cache)
         {
-            context = klinikaContext;
-            hash = ihash;
-            cache = _cache;
+            _context = klinikaContext;
+            _hash = hash;
+            _cache = cache;
         }
 
         public async Task<int> Handle(CreateChorobaCommand req, CancellationToken cancellationToken)
         {
-            if(context.Chorobas.Where(x => x.Nazwa.Equals(req.request.Nazwa)).Any())
+            if(_context.Chorobas.Where(x => x.Nazwa.Equals(req.request.Nazwa)).Any())
             {
                 throw new Exception("already exists");
             }
 
-            context.Chorobas.Add(new Choroba
+            _context.Chorobas.Add(new Choroba
             {
                 Nazwa = req.request.Nazwa,
                 NazwaLacinska = req.request.NazwaLacinska,
                 Opis = req.request.Opis
             });
 
-            int result = await context.SaveChangesAsync(cancellationToken);
-            cache.Remove();
+            int result = await _context.SaveChangesAsync(cancellationToken);
+            _cache.Remove();
 
             return result;
         }

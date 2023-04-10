@@ -1,16 +1,12 @@
-﻿using Application.Uslugi.Queries;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System.Data;
-using System.Threading.Tasks;
-using System.Threading;
+﻿using Application.WizytaUslugi.Commands;
 using Application.WizytaUslugi.Queries;
-using Application.Wizyty.Queries;
-using System;
-using Application.WizytaUslugi.Commands;
 using Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PRO_API.Common;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace PRO_API.Controllers
 {
@@ -20,15 +16,7 @@ namespace PRO_API.Controllers
         [HttpGet("{ID_wizyta}")]
         public async Task<IActionResult> GetWizytaUslugaList(string ID_wizyta, CancellationToken token)
         {
-            if(isAdmin() || isWeterynarz())
-            {
-                return Ok(await Mediator.Send(new WizytaUslugaKlinikaQuery
-                {
-                    ID_wizyta = ID_wizyta
-                }, token));
-            }
-
-            return Ok(await Mediator.Send(new WizytaUslugaKlientQuery
+            return Ok(await Mediator.Send(new WizytaUslugaQuery
             {
                 ID_wizyta = ID_wizyta
             }, token));

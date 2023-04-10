@@ -20,46 +20,46 @@ namespace Application.Weterynarze.Commands
         public WeterynarzCreateRequest request { get; set; }
     }
 
-    public class CreateWeterynarzCommandHandle : IRequestHandler<CreateWeterynarzCommand, object>
+    public class CreateWeterynarzCommandHandler : IRequestHandler<CreateWeterynarzCommand, object>
     {
-        private readonly IKlinikaContext context;
-        private readonly IPasswordRepository passwordRepository;
-        private readonly IConfiguration configuration;
-        private readonly IHash hash;
-        private readonly IEmailSender emailSender;
-        private readonly ICache<GetWeterynarzListResponse> cache;
-        public CreateWeterynarzCommandHandle(IKlinikaContext klinikaContext, IPasswordRepository password, IConfiguration config, IHash _hash, IEmailSender sender, ICache<GetWeterynarzListResponse> _cache)
+        private readonly IKlinikaContext _context;
+        private readonly IPassword _password;
+        private readonly IConfiguration _configuration;
+        private readonly IHash _hash;
+        private readonly IEmailSender _emailSender;
+        private readonly ICache<GetWeterynarzListResponse> _cache;
+        public CreateWeterynarzCommandHandler(IKlinikaContext klinikaContext, IPassword password, IConfiguration config, IHash hash, IEmailSender sender, ICache<GetWeterynarzListResponse> cache)
         {
-            context = klinikaContext;
-            passwordRepository = password;
-            configuration = config;
-            hash = _hash;
-            emailSender = sender;
-            cache = _cache;
+            _context = klinikaContext;
+            _password = password;
+            _configuration = config;
+            _hash = hash;
+            _emailSender = sender;
+            _cache = cache;
         }
 
         public async Task<object> Handle(CreateWeterynarzCommand req, CancellationToken cancellationToken)
         {
             var generatedLogin = "PetMed1";
 
-            if (context.Weterynarzs.Any())
+            if (_context.Weterynarzs.Any())
             {
-                generatedLogin = "PetMed" + (context.Weterynarzs.Max(x => x.IdOsoba) + 1);
+                generatedLogin = "PetMed" + (_context.Weterynarzs.Max(x => x.IdOsoba) + 1);
             }
             
-            if (context.Osobas.Where(x => x.NazwaUzytkownika.Equals(generatedLogin)).Any())
+            if (_context.Osobas.Where(x => x.NazwaUzytkownika.Equals(generatedLogin)).Any())
             {
                 throw new Exception("Not unique");
             }
 
-            var generatedPassword = passwordRepository.GetRandomPassword(8);
-            byte[] salt = passwordRepository.GenerateSalt();
-            var hashedPassword = passwordRepository.HashPassword(salt, generatedPassword, int.Parse(configuration["PasswordIterations"]));
+            var generatedPassword = _password.GetRandomPassword(8);
+            byte[] salt = _password.GenerateSalt();
+            var hashedPassword = _password.HashPassword(salt, generatedPassword, int.Parse(_configuration["PasswordIterations"]));
             string saltBase64 = Convert.ToBase64String(salt);
 
             var query = "exec DodajWeterynarza @imie, @nazwisko, @dataUr, @numerTel, @email, @login, @haslo, @pensja, @dataZatrudnienia, @salt";
 
-            SqlConnection connection = new SqlConnection(configuration.GetConnectionString("KlinikaDatabase"));
+            SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("KlinikaDatabase"));
             connection.Open();
             //SqlTransaction trans = connection.BeginTransaction();
             SqlCommand command = new SqlCommand(query, connection);
@@ -76,11 +76,11 @@ namespace Application.Weterynarze.Commands
 
             int resultID = Convert.ToInt32(command.ExecuteScalar());
             await connection.CloseAsync();
-            await emailSender.SendHasloEmail(req.request.Email, generatedPassword);
-            cache.Remove();
+            await _emailSender.SendHasloEmail(req.request.Email, generatedPassword);
+            _cache.Remove();
             return new 
             { 
-                ID = hash.Encode(resultID) 
+                ID = _hash.Encode(resultID) 
             };
         }
     }

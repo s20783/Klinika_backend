@@ -14,25 +14,25 @@ namespace Application.Weterynarze.Commands
         public string ID_osoba { get; set; }
     }
 
-    public class DeleteWeterynarzCommandHandle : IRequestHandler<DeleteWeterynarzCommand, int>
+    public class DeleteWeterynarzCommandHandler : IRequestHandler<DeleteWeterynarzCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly ICache<GetWeterynarzListResponse> cache;
-        private readonly IHarmonogramRepository harmonogram;
-        public DeleteWeterynarzCommandHandle(IKlinikaContext klinikaContext, IHash _hash, ICache<GetWeterynarzListResponse> _cache, IHarmonogramRepository _harmonogram)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly ICache<GetWeterynarzListResponse> _cache;
+        private readonly IHarmonogram _harmonogram;
+        public DeleteWeterynarzCommandHandler(IKlinikaContext klinikaContext, IHash hash, ICache<GetWeterynarzListResponse> cache, IHarmonogram harmonogram)
         {
-            context = klinikaContext;
-            hash = _hash;
-            cache = _cache;
-            harmonogram = _harmonogram;
+            _context = klinikaContext;
+            _hash = hash;
+            _cache = cache;
+            _harmonogram = harmonogram;
         }
 
         public async Task<int> Handle(DeleteWeterynarzCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_osoba);
+            int id = _hash.Decode(req.ID_osoba);
 
-            var weterynarz = context.Osobas.Where(x => x.IdOsoba == id).First();
+            var weterynarz = _context.Osobas.Where(x => x.IdOsoba == id).First();
             weterynarz.Nazwisko = weterynarz.Nazwisko.ElementAt(0).ToString();
             weterynarz.Haslo = "";
             weterynarz.Salt = "";
@@ -40,20 +40,20 @@ namespace Application.Weterynarze.Commands
             weterynarz.Email = "";
             weterynarz.NumerTelefonu = "";
 
-            var x = context.GodzinyPracies.Where(x => x.IdOsoba == id).ToList();
+            var x = _context.GodzinyPracies.Where(x => x.IdOsoba == id).ToList();
             if (x.Any())
             {
-                context.GodzinyPracies.RemoveRange(x);
+                _context.GodzinyPracies.RemoveRange(x);
             }
 
-            var harmonograms = context.Harmonograms.Where(x => x.WeterynarzIdOsoba == id && x.DataRozpoczecia > DateTime.Now).ToList();
+            var harmonograms = _context.Harmonograms.Where(x => x.WeterynarzIdOsoba == id && x.DataRozpoczecia > DateTime.Now).ToList();
             if(harmonograms.Any()) 
             {
-                await harmonogram.DeleteHarmonograms(harmonograms, context);
+                await _harmonogram.DeleteHarmonograms(harmonograms, _context);
             }
 
-            int result = await context.SaveChangesAsync(cancellationToken);
-            cache.Remove();
+            int result = await _context.SaveChangesAsync(cancellationToken);
+            _cache.Remove();
 
             return result;
         }

@@ -16,24 +16,24 @@ namespace Application.Szczepionki.Commands
 
     public class DeleteSzczepionkaCommandHandler : IRequestHandler<DeleteSzczepionkaCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public DeleteSzczepionkaCommandHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public DeleteSzczepionkaCommandHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(DeleteSzczepionkaCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_szczepionka);
+            int id = _hash.Decode(req.ID_szczepionka);
 
-            context.LekWMagazynies.RemoveRange(context.LekWMagazynies.Where(x => x.IdLek.Equals(id)).ToList());
-            context.Szczepienies.RemoveRange(context.Szczepienies.Where(x => x.IdLek.Equals(id)).ToList());
-            context.Szczepionkas.Remove(context.Szczepionkas.Where(x => x.IdLek.Equals(id)).First());
-            context.Leks.Remove(context.Leks.Where(x => x.IdLek.Equals(id)).First());
+            _context.LekWMagazynies.RemoveRange(_context.LekWMagazynies.Where(x => x.IdLek.Equals(id)).ToList());
+            _context.Szczepienies.RemoveRange(_context.Szczepienies.Where(x => x.IdLek.Equals(id)).ToList());
+            _context.Szczepionkas.Remove(_context.Szczepionkas.Where(x => x.IdLek.Equals(id)).First());
+            _context.Leks.Remove(_context.Leks.Where(x => x.IdLek.Equals(id)).First());
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

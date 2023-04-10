@@ -6,9 +6,9 @@ using System;
 
 namespace Infrastructure.Services
 {
-    public class LoginService : ILoginRepository
+    public class LoginService : ILogin
     {
-        public bool CheckCredentails(Osoba user, IPasswordRepository passwordRepository, string haslo, int iterations)
+        public bool CheckCredentails(Osoba user, IPassword passwordRepository, string haslo, int iterations)
         {
             if (user == null)
             {

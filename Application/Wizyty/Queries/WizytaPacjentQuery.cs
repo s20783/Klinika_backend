@@ -1,6 +1,7 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,39 +18,37 @@ namespace Application.Wizyty.Queries
 
     public class WizytaPacjentQueryHandler : IRequestHandler<WizytaPacjentQuery, List<GetWizytaListResponse>>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public WizytaPacjentQueryHandler(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public WizytaPacjentQueryHandler(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<List<GetWizytaListResponse>> Handle(WizytaPacjentQuery req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_Pacjent);
+            int id = _hash.Decode(req.ID_Pacjent);
 
-            return (from x in context.Wizyta
-                    join d in context.Harmonograms on x.IdWizyta equals d.IdWizyta into harmonogram
+            return (from x in _context.Wizyta
+                    join d in _context.Harmonograms on x.IdWizyta equals d.IdWizyta into harmonogram
                     from y in harmonogram.DefaultIfEmpty()
                     where x.IdPacjent == id
                     group x by new { x.IdWizyta, x.IdOsoba, x.IdPacjent, x.Status, x.CzyOplacona, y.WeterynarzIdOsoba }
                     into g
                     select new GetWizytaListResponse()
                     {
-                        IdWizyta = hash.Encode(g.Key.IdWizyta),
+                        IdWizyta = _hash.Encode(g.Key.IdWizyta),
                         IdPacjent = req.ID_Pacjent,
                         Pacjent = null,
                         IdKlient = null,
                         Klient = null,
-                        IdWeterynarz = g.Key.WeterynarzIdOsoba != null ? hash.Encode(g.Key.WeterynarzIdOsoba) : null,
-                        Weterynarz = g.Key.WeterynarzIdOsoba != null ? context.Osobas.Where(i => i.IdOsoba.Equals(g.Key.WeterynarzIdOsoba)).Select(i => i.Imie + " " + i.Nazwisko).First() : null,
+                        IdWeterynarz = g.Key.WeterynarzIdOsoba != null ? _hash.Encode(g.Key.WeterynarzIdOsoba) : null,
+                        Weterynarz = g.Key.WeterynarzIdOsoba != null ? _context.Osobas.Where(i => i.IdOsoba.Equals(g.Key.WeterynarzIdOsoba)).Select(i => i.Imie + " " + i.Nazwisko).First() : null,
                         Status = g.Key.Status,
                         CzyOplacona = g.Key.CzyOplacona,
-                        Data = g.Key.WeterynarzIdOsoba != null ? context.Harmonograms.Where(x => x.IdWizyta.Equals(g.Key.IdWizyta)).OrderBy(x => x.DataRozpoczecia).Select(x => x.DataRozpoczecia).First() : null
+                        Data = g.Key.WeterynarzIdOsoba != null ? _context.Harmonograms.Where(x => x.IdWizyta.Equals(g.Key.IdWizyta)).OrderBy(x => x.DataRozpoczecia).Select(x => x.DataRozpoczecia).First() : null
                     })
-                    .AsParallel()
-                    .WithCancellation(cancellationToken)
                     .ToList()
                     .OrderByDescending(x => x.Data)
                     .ToList();

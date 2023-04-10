@@ -18,31 +18,31 @@ namespace Application.Urlopy.Commands
 
     public class UpdateUrlopCommandHandler : IRequestHandler<UpdateUrlopCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly IHarmonogramRepository harmonogramService;
-        public UpdateUrlopCommandHandler(IKlinikaContext klinikaContext, IHash _hash, IHarmonogramRepository harmonogramRepository)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly IHarmonogram _harmonogramService;
+        public UpdateUrlopCommandHandler(IKlinikaContext klinikaContext, IHash hash, IHarmonogram harmonogramRepository)
         {
-            context = klinikaContext;
-            hash = _hash;
-            harmonogramService = harmonogramRepository;
+            _context = klinikaContext;
+            _hash = hash;
+            _harmonogramService = harmonogramRepository;
         }
 
         public async Task<int> Handle(UpdateUrlopCommand req, CancellationToken cancellationToken)
         {
-            int weterynarzID = hash.Decode(req.request.ID_weterynarz);
-            int urlopID = hash.Decode(req.ID_urlop);
+            int weterynarzID = _hash.Decode(req.request.ID_weterynarz);
+            int urlopID = _hash.Decode(req.ID_urlop);
 
-            var urlop = context.Urlops.Where(x => x.IdUrlop.Equals(urlopID)).First();
+            var urlop = _context.Urlops.Where(x => x.IdUrlop.Equals(urlopID)).First();
 
-            await harmonogramService.DeleteHarmonograms(
-                context.Harmonograms.Where(x => x.DataRozpoczecia.Date.Equals(req.request.Dzien) && x.WeterynarzIdOsoba.Equals(weterynarzID)).ToList(),
-                context);
+            await _harmonogramService.DeleteHarmonograms(
+                _context.Harmonograms.Where(x => x.DataRozpoczecia.Date.Equals(req.request.Dzien) && x.WeterynarzIdOsoba.Equals(weterynarzID)).ToList(),
+                _context);
 
-            urlop.IdOsoba = hash.Decode(req.request.ID_weterynarz);
+            urlop.IdOsoba = _hash.Decode(req.request.ID_weterynarz);
             urlop.Dzien = req.request.Dzien.Date;
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

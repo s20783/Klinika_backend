@@ -1,7 +1,9 @@
 ﻿using Application.DTO.Responses;
 using Application.Interfaces;
+using AutoMapper;
 using Domain;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using ServiceLayer.DTO.Responses;
 using System;
 using System.Collections.Generic;
@@ -20,34 +22,31 @@ namespace Application.Choroby.Queries
 
     public class ChorobaListQueryHandler : IRequestHandler<ChorobaListQuery, PaginatedResponse<GetChorobaResponse>>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        private readonly ICache<GetChorobaResponse> cache;
-        public ChorobaListQueryHandler(IKlinikaContext klinikaContext, IHash _hash, ICache<GetChorobaResponse> _cache)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        private readonly ICache<GetChorobaResponse> _cache;
+        private readonly IMapper _mapper;
+        public ChorobaListQueryHandler(IKlinikaContext klinikaContext, IHash hash, ICache<GetChorobaResponse> cache, IMapper mapper)
         {
-            context = klinikaContext;
-            hash = _hash;
-            cache = _cache;
+            _context = klinikaContext;
+            _hash = hash;
+            _cache = cache;
+            _mapper = mapper;
         }
 
         public async Task<PaginatedResponse<GetChorobaResponse>> Handle(ChorobaListQuery req, CancellationToken cancellationToken)
         {
             List<GetChorobaResponse> data;
-            data = cache.GetFromCache();
+            data = _cache.GetFromCache();
 
             if(data is null)
             {
-                data = (from x in context.Chorobas
-                        orderby x.Nazwa
-                        select new GetChorobaResponse()
-                        {
-                            ID_Choroba = hash.Encode(x.IdChoroba),
-                            Nazwa = x.Nazwa,
-                            NazwaLacinska = x.NazwaLacinska,
-                            Opis = x.Opis
-                        }).AsParallel().WithCancellation(cancellationToken).ToList();
+                data = _mapper.Map<List<GetChorobaResponse>>(await _context.Chorobas
+                    .OrderBy(x => x.Nazwa)
+                    .ToListAsync(cancellationToken)
+                    );
 
-                cache.AddToCache(data);
+                _cache.AddToCache(data);
             }
 
             var results = data

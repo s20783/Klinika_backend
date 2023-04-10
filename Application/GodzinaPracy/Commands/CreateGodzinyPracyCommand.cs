@@ -19,29 +19,29 @@ namespace Application.GodzinaPracy.Commands
 
     public class CreateGodzinyPracyCommandHandle : IRequestHandler<CreateGodzinyPracyCommand, int>
     {
-        private readonly IKlinikaContext context;
-        private readonly IHash hash;
-        public CreateGodzinyPracyCommandHandle(IKlinikaContext klinikaContext, IHash _hash)
+        private readonly IKlinikaContext _context;
+        private readonly IHash _hash;
+        public CreateGodzinyPracyCommandHandle(IKlinikaContext klinikaContext, IHash hash)
         {
-            context = klinikaContext;
-            hash = _hash;
+            _context = klinikaContext;
+            _hash = hash;
         }
 
         public async Task<int> Handle(CreateGodzinyPracyCommand req, CancellationToken cancellationToken)
         {
-            int id = hash.Decode(req.ID_osoba);
+            int id = _hash.Decode(req.ID_osoba);
             var i = 0;
 
             foreach (GodzinyPracyRequest request in req.requestList)
             {
 
                 i = request.DzienTygodnia;
-                if (context.GodzinyPracies.Where(x => x.DzienTygodnia == i && x.IdOsoba == id).Any())
+                if (_context.GodzinyPracies.Where(x => x.DzienTygodnia == i && x.IdOsoba == id).Any())
                 {
                     throw new Exception("Ten weterynarz ma już ustawione godziny pracy tego dnia");
                 }
 
-                context.GodzinyPracies.Add(new GodzinyPracy
+                _context.GodzinyPracies.Add(new GodzinyPracy
                 {
                     IdOsoba = id,
                     DzienTygodnia = i,
@@ -50,7 +50,7 @@ namespace Application.GodzinaPracy.Commands
                 });
             }
 
-            return await context.SaveChangesAsync(cancellationToken);
+            return await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }
