@@ -2,12 +2,9 @@
 using Application.Szczepienia.Commands;
 using Application.Szczepienia.Queries;
 using Domain.Enums;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PRO_API.Common;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,7 +12,7 @@ namespace PRO_API.Controllers
 {
     public class SzczepienieController : ApiControllerBase
     {
-        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz, RolaEnum.Klient)]
         [HttpGet("{ID_pacjent}")]
         public async Task<IActionResult> GetSzczepienie(string ID_pacjent, CancellationToken token)
         {

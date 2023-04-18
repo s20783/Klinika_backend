@@ -23,13 +23,11 @@ namespace Application.Pacjenci.Queries
     public class GetPacjentListQueryHandle : IRequestHandler<PacjentListQuery, PaginatedResponse<GetPacjentListResponse>>
     {
         private readonly IKlinikaContext _context;
-        private readonly IHash _hash;
         private readonly ICache<GetPacjentListResponse> _cache;
         private readonly IMapper _mapper;
-        public GetPacjentListQueryHandle(IKlinikaContext klinikaContext, IHash hash, ICache<GetPacjentListResponse> cache, IMapper mapper)
+        public GetPacjentListQueryHandle(IKlinikaContext klinikaContext, ICache<GetPacjentListResponse> cache, IMapper mapper)
         {
             _context = klinikaContext;
-            _hash = hash;
             _cache = cache;
             _mapper = mapper;
         }
@@ -46,20 +44,6 @@ namespace Application.Pacjenci.Queries
                     .ThenInclude(x => x.IdOsobaNavigation)
                     .ToListAsync(cancellationToken)
                     );
-
-                /*data = (from x in _context.Pacjents
-                        join y in _context.Osobas on x.IdOsoba equals y.IdOsoba
-                        orderby x.Nazwa
-                        select new GetPacjentListResponse()
-                        {
-                            IdOsoba = _hash.Encode(x.IdOsoba),
-                            IdPacjent = _hash.Encode(x.IdPacjent),
-                            Nazwa = x.Nazwa,
-                            Gatunek = x.Gatunek,
-                            Rasa = x.Rasa,
-                            Plec = x.Plec,
-                            Wlasciciel = y.Imie + ' ' + y.Nazwisko
-                        }).ToList();*/
 
                 _cache.AddToCache(data);
             }

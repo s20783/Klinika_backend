@@ -25,6 +25,7 @@ namespace PRO_API.Controllers
             }, token));
         }
 
+
         [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpGet("all")]
         public async Task<IActionResult> GetAll(CancellationToken token)

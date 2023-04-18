@@ -31,7 +31,7 @@ namespace Application.WeterynarzSpecjalizacje.Queries
         {
             int id = _hash.Decode(req.ID_weterynarz);
 
-            return _mapper.Map<List<GetSpecjalizacjaResponse>>(_context.WeterynarzSpecjalizacjas
+            return _mapper.Map<List<GetSpecjalizacjaResponse>>(await _context.WeterynarzSpecjalizacjas
                 .Include(x => x.IdSpecjalizacjaNavigation)
                 .Where(x => x.IdOsoba == id)
                 .OrderBy(x => x.IdSpecjalizacjaNavigation.Nazwa)

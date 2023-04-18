@@ -73,14 +73,14 @@ namespace PRO_API.Controllers
         //admin wyświetla harmonogram weterynarza
         [AuthorizeRoles(RolaEnum.Admin)]
         [HttpGet("klinika/{ID_osoba}")]
-        public async Task<IActionResult> GetKlinikaAdminHarmonogram(string ID_osoba, DateTime Date, CancellationToken token)
+        public async Task<IActionResult> GetKlinikaAdminHarmonogram(string ID_osoba, DateTime date, CancellationToken token)
         {
             try
             {
                 return Ok(await Mediator.Send(new HarmonogramAdminByIDQuery
                 {
                     ID_osoba = ID_osoba,
-                    Date = Date,
+                    Date = date,
                 }, token));
             }
             catch (Exception)

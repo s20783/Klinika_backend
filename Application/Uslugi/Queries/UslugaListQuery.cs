@@ -39,7 +39,7 @@ namespace Application.Uslugi.Queries
 
             if (data is null)
             {
-                data = _mapper.Map<List<GetUslugaResponse>>(_context.Uslugas
+                data = _mapper.Map<List<GetUslugaResponse>>(await _context.Uslugas
                     .OrderBy(x => x.NazwaUslugi)
                     .ToListAsync(cancellationToken)
                     );

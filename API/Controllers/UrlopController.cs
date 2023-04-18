@@ -2,12 +2,9 @@
 using Application.Urlopy.Commands;
 using Application.Urlopy.Queries;
 using Domain.Enums;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PRO_API.Common;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 

@@ -2,9 +2,7 @@
 using Application.Weterynarze.Commands;
 using Application.Weterynarze.Queries;
 using Domain.Enums;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using PRO_API.Common;
 using System;
 using System.Threading;
@@ -23,6 +21,14 @@ namespace PRO_API.Controllers
                 SearchWord = search,
                 Page = page
             }, token));
+        }
+
+
+        [AuthorizeRoles(RolaEnum.Admin)]
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllWeterynarz(CancellationToken token)
+        {
+            return Ok(await Mediator.Send(new WeterynarzListAllQuery(), token));
         }
 
 
@@ -50,10 +56,7 @@ namespace PRO_API.Controllers
             }
             catch (Exception e)
             {
-                return NotFound(new
-                {
-                    message = e.Message
-                });
+                return NotFound(e.Message);
             }
         }
 
@@ -72,7 +75,7 @@ namespace PRO_API.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e);
+                return BadRequest(e.Message);
             }
         }
 
@@ -90,7 +93,7 @@ namespace PRO_API.Controllers
             }
             catch(Exception e)
             {
-                return NotFound(e);
+                return NotFound(e.Message);
             }
             
             return NoContent();

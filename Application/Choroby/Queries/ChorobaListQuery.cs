@@ -8,7 +8,6 @@ using ServiceLayer.DTO.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,13 +22,11 @@ namespace Application.Choroby.Queries
     public class ChorobaListQueryHandler : IRequestHandler<ChorobaListQuery, PaginatedResponse<GetChorobaResponse>>
     {
         private readonly IKlinikaContext _context;
-        private readonly IHash _hash;
         private readonly ICache<GetChorobaResponse> _cache;
         private readonly IMapper _mapper;
-        public ChorobaListQueryHandler(IKlinikaContext klinikaContext, IHash hash, ICache<GetChorobaResponse> cache, IMapper mapper)
+        public ChorobaListQueryHandler(IKlinikaContext klinikaContext, ICache<GetChorobaResponse> cache, IMapper mapper)
         {
             _context = klinikaContext;
-            _hash = hash;
             _cache = cache;
             _mapper = mapper;
         }

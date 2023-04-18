@@ -32,6 +32,21 @@ namespace PRO_API.Controllers
 
 
         [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllSzczepionka(CancellationToken token)
+        {
+            try
+            {
+                return Ok(await Mediator.Send(new SzczepionkaListAllQuery(), token));
+            }
+            catch (Exception)
+            {
+                return NotFound();
+            }
+        }
+
+
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpGet("details/{ID_szczepionka}")]
         public async Task<IActionResult> GetSzczepionkaDetails(string ID_szczepionka, CancellationToken token)
         {

@@ -10,7 +10,7 @@ namespace Application.Szczepionki.Commands
 
             RuleFor(x => x.request.Producent).MaximumLength(50);
 
-            RuleFor(x => x.request.Zastosowanie).MinimumLength(2).MaximumLength(100);
+            RuleFor(x => x.request.Zastosowanie).MaximumLength(100);
 
             RuleFor(x => x.request.OkresWaznosci).GreaterThan(0);
         }

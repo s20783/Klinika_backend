@@ -31,7 +31,7 @@ namespace Application.WizytaUslugi.Queries
         {
             int id = _hash.Decode(req.ID_wizyta);
 
-            return _mapper.Map<List<GetUslugaResponse>>(_context.WizytaUslugas
+            return _mapper.Map<List<GetUslugaResponse>>(await _context.WizytaUslugas
                 .Include(x => x.IdUslugaNavigation)
                 .Where(x => x.IdWizyta == id)
                 .OrderBy(x => x.IdUslugaNavigation.NazwaUslugi)

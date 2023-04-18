@@ -395,6 +395,41 @@ namespace Test
                     IdPacjent = 1,
                     Status = WizytaStatus.Zaplanowana.ToString()
                 },
+                new Wizytum
+                {
+                    IdWizyta = 9,
+                    IdOsoba = 4,
+                    IdPacjent = 1,
+                    Status = WizytaStatus.Zaplanowana.ToString()
+                },
+                new Wizytum
+                {
+                    IdWizyta = 10,
+                    IdOsoba = 4,
+                    IdPacjent = 1,
+                    Status = WizytaStatus.Zaplanowana.ToString()
+                },
+                new Wizytum
+                {
+                    IdWizyta = 11,
+                    IdOsoba = 4,
+                    IdPacjent = 1,
+                    Status = WizytaStatus.Zaplanowana.ToString()
+                },
+                new Wizytum
+                {
+                    IdWizyta = 12,
+                    IdOsoba = 4,
+                    IdPacjent = 1,
+                    Status = WizytaStatus.Zaplanowana.ToString()
+                },
+                new Wizytum
+                {
+                    IdWizyta = 13,
+                    IdOsoba = 4,
+                    IdPacjent = 1,
+                    Status = WizytaStatus.Zaplanowana.ToString()
+                },
             };
         }
 

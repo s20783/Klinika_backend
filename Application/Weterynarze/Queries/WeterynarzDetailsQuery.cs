@@ -3,10 +3,7 @@ using Application.Interfaces;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,12 +14,12 @@ namespace Application.Weterynarze.Queries
         public string ID_osoba { get; set; }
     }
 
-    public class GetWeterynarzQueryHandle : IRequestHandler<WeterynarzDetailsQuery, GetWeterynarzResponse>
+    public class GetWeterynarzQueryHandler : IRequestHandler<WeterynarzDetailsQuery, GetWeterynarzResponse>
     {
         private readonly IKlinikaContext _context;
         private readonly IHash _hash;
         private readonly IMapper _mapper;
-        public GetWeterynarzQueryHandle(IKlinikaContext klinikaContext, IHash hash, IMapper mapper)
+        public GetWeterynarzQueryHandler(IKlinikaContext klinikaContext, IHash hash, IMapper mapper)
         {
             _context = klinikaContext;
             _hash = hash;

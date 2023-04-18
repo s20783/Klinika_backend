@@ -26,6 +26,14 @@ namespace PRO_API.Controllers
 
 
         [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllChoroba(CancellationToken token)
+        {
+            return Ok(await Mediator.Send(new ChorobaListAllQuery(), token));
+        }
+
+
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpGet("{ID_Choroba}")]
         public async Task<IActionResult> GetChorobaDetails(string ID_Choroba, CancellationToken token)
         {

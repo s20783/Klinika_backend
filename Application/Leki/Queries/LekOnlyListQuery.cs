@@ -3,11 +3,8 @@ using Application.Interfaces;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,12 +18,10 @@ namespace Application.Leki.Queries
     public class LekOnlyListQueryHandler : IRequestHandler<LekOnlyListQuery, List<GetLekResponse>>
     {
         private readonly IKlinikaContext _context;
-        private readonly IHash _hash;
         private readonly IMapper _mapper;
-        public LekOnlyListQueryHandler(IKlinikaContext context, IHash hash, IMapper mapper)
+        public LekOnlyListQueryHandler(IKlinikaContext context, IMapper mapper)
         {
             _context = context;
-            _hash = hash;
             _mapper = mapper;
         }
 

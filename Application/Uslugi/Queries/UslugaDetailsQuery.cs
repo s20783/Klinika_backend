@@ -30,7 +30,7 @@ namespace Application.Uslugi.Queries
         {
             int id = _hash.Decode(req.ID_usluga);
 
-            return _mapper.Map<GetUslugaResponse>(_context.Uslugas
+            return _mapper.Map<GetUslugaResponse>(await _context.Uslugas
                 .Where(x => x.IdUsluga == id)
                 .FirstOrDefaultAsync(cancellationToken)
                 );

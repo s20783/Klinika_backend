@@ -24,6 +24,15 @@ namespace PRO_API.Controllers
             }, token));
         }
 
+
+        [AuthorizeRoles(RolaEnum.Admin)]
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllSpecjalizacja(CancellationToken token)
+        {
+            return Ok(await Mediator.Send(new SpecjalizacjaListAllQuery(), token));
+        }
+
+
         [AuthorizeRoles(RolaEnum.Admin)]
         [HttpGet("details/{ID_specjalizacja}")]
         public async Task<IActionResult> GetSpecjalizacjaById(string ID_specjalizacja, CancellationToken token)

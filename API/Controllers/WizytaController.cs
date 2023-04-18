@@ -25,7 +25,7 @@ namespace PRO_API.Controllers
             }, token));
         }
 
-        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz, RolaEnum.Klient)]
+        [AuthorizeRoles(RolaEnum.Weterynarz, RolaEnum.Klient)]
         [HttpGet("moje_wizyty")]
         public async Task<IActionResult> GetWizytaKlient(CancellationToken token)
         {

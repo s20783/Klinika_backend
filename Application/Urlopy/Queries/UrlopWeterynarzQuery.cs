@@ -3,10 +3,8 @@ using Application.Interfaces;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -37,7 +35,7 @@ namespace Application.Urlopy.Queries
                 .Include(x => x.IdOsobaNavigation)
                 .ThenInclude(x => x.IdOsobaNavigation)
                 .Where(x => x.IdOsoba == id)
-                .FirstOrDefaultAsync(cancellationToken)
+                .ToListAsync(cancellationToken)
                  );
         }
     }

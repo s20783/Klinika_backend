@@ -12,7 +12,7 @@ namespace Application.Choroby.Commands
 
             RuleFor(x => x.request.Opis).MaximumLength(500);
 
-            RuleFor(x => x.request.NazwaLacinska).MinimumLength(2).MaximumLength(50);
+            RuleFor(x => x.request.NazwaLacinska).MaximumLength(50);
         }
     }
 }

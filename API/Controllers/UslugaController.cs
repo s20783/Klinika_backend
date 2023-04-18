@@ -24,6 +24,15 @@ namespace PRO_API.Controllers
             }, token));
         }
 
+
+        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllUsluga(CancellationToken token)
+        {
+            return Ok(await Mediator.Send(new UslugaListAllQuery(), token));
+        }
+
+
         [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
         [HttpGet("details/{ID_usluga}")]
         public async Task<IActionResult> GetUslugaDetails(string ID_usluga, CancellationToken token)

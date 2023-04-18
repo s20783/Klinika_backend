@@ -109,7 +109,6 @@ namespace Application.Common
                .ForMember(x => x.IdOsoba, y => y.MapFrom(s => _hash.Encode(s.IdOsoba)));
 
             CreateMap<Osoba, GetWeterynarzResponse>()
-               .ForMember(x => x.IdOsoba, y => y.MapFrom(s => _hash.Encode(s.IdOsoba)))
                .ForMember(x => x.DataZatrudnienia, y => y.MapFrom(s => s.Weterynarz.DataZatrudnienia))
                .ForMember(x => x.DataUrodzenia, y => y.MapFrom(s => s.Weterynarz.DataUrodzenia))
                .ForMember(x => x.Pensja, y => y.MapFrom(s => s.Weterynarz.Pensja));

@@ -143,14 +143,14 @@ namespace PRO_API.Controllers
 
         [AuthorizeRoles(RolaEnum.Admin)]
         [HttpDelete("{ID_osoba}")]
-        public async Task<IActionResult> DeleteGodzinyPracy(string ID_osoba, int dzien, CancellationToken token)
+        public async Task<IActionResult> DeleteGodzinyPracy(string ID_osoba, int day, CancellationToken token)
         {
             try
             {
                 await Mediator.Send(new DeleteGodzinyPracyCommand
                 {
                     ID_osoba = ID_osoba,
-                    dzien = dzien
+                    dzien = day
                 }, token);
             }
             catch (Exception)

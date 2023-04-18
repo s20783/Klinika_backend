@@ -23,12 +23,10 @@ namespace Application.Szczepionki.Queries
     public class SzczepionkaListQueryHandler : IRequestHandler<SzczepionkaListQuery, PaginatedResponse<GetSzczepionkaResponse>>
     {
         private readonly IKlinikaContext _context;
-        private readonly IHash _hash;
         private readonly IMapper _mapper;
-        public SzczepionkaListQueryHandler(IKlinikaContext klinikaContext, IHash hash, IMapper mapper)
+        public SzczepionkaListQueryHandler(IKlinikaContext klinikaContext, IMapper mapper)
         {
             _context = klinikaContext;
-            _hash = hash;
             _mapper = mapper;
         }
 

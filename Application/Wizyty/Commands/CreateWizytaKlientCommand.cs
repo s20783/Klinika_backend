@@ -76,7 +76,7 @@ namespace Application.Wizyty.Commands
                 catch (Exception e)
                 {
                     transaction.Dispose();
-                    throw e;
+                    throw new Exception(e.Message);
                 }
 
                 transaction.Dispose();

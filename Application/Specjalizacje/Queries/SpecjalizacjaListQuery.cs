@@ -23,13 +23,11 @@ namespace Application.Specjalizacje.Queries
     public class SpecjalizacjaListQueryHandler : IRequestHandler<SpecjalizacjaListQuery, PaginatedResponse<GetSpecjalizacjaResponse>>
     {
         private readonly IKlinikaContext _context;
-        private readonly IHash _hash;
         private readonly ICache<GetSpecjalizacjaResponse> _cache;
         private readonly IMapper _mapper;
-        public SpecjalizacjaListQueryHandler(IKlinikaContext klinikaContext, IHash hash, ICache<GetSpecjalizacjaResponse> cache, IMapper mapper)
+        public SpecjalizacjaListQueryHandler(IKlinikaContext klinikaContext, ICache<GetSpecjalizacjaResponse> cache, IMapper mapper)
         {
             _context = klinikaContext;
-            _hash = hash;
             _cache = cache;
             _mapper = mapper;
         }

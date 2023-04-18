@@ -25,7 +25,7 @@ namespace Application.Weterynarze.Queries
         private readonly IKlinikaContext _context;
         private readonly ICache<GetWeterynarzListResponse> _cache;
         private readonly IMapper _mapper;
-        public WeterynarzListQueryHandler(IKlinikaContext klinikaContext, IHash hash, ICache<GetWeterynarzListResponse> cache, IMapper mapper)
+        public WeterynarzListQueryHandler(IKlinikaContext klinikaContext, ICache<GetWeterynarzListResponse> cache, IMapper mapper)
         {
             _context = klinikaContext;
             _cache = cache;
@@ -39,6 +39,8 @@ namespace Application.Weterynarze.Queries
             if (data is null)
             {
                 data = _mapper.Map<List<GetWeterynarzListResponse>>(await _context.Osobas
+                    .Include(x => x.Weterynarz)
+                    .Where(x => x.Weterynarz != null)
                     .ToListAsync(cancellationToken)
                     );
 
