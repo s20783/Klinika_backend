@@ -48,23 +48,6 @@ namespace PRO_API.Controllers
             }
         }
 
-        [AuthorizeRoles(RolaEnum.Admin)]
-        [HttpPost("list/{ID_osoba}")]
-        public async Task<IActionResult> AddGodzinyPracyList(string ID_osoba, List<GodzinyPracyRequest> requests, CancellationToken token)
-        {
-            try
-            {
-                return Ok(await Mediator.Send(new CreateGodzinyPracyCommand
-                {
-                    ID_osoba = ID_osoba,
-                    requestList = requests
-                }, token));
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-        }
 
         [AuthorizeRoles(RolaEnum.Admin)]
         [HttpPost("default/{ID_osoba}")]
@@ -92,7 +75,7 @@ namespace PRO_API.Controllers
                 return Ok(await Mediator.Send(new CreateGodzinyPracyCommand
                 {
                     ID_osoba = ID_osoba,
-                    requestList = new List<GodzinyPracyRequest>() { request }
+                    Request = request 
                 }, token));
             }
             catch (Exception e)
@@ -101,25 +84,6 @@ namespace PRO_API.Controllers
             }
         }
 
-        [AuthorizeRoles(RolaEnum.Admin)]
-        [HttpPut("list/{ID_osoba}")]
-        public async Task<IActionResult> UpdateGodzinyPracy(string ID_osoba, List<GodzinyPracyRequest> requests, CancellationToken token)
-        {
-            try
-            {
-                await Mediator.Send(new UpdateGodzinyPracyCommand
-                {
-                    ID_osoba = ID_osoba,
-                    requestList = requests
-                }, token);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-
-            return NoContent();
-        }
 
         [AuthorizeRoles(RolaEnum.Admin)]
         [HttpPut("{ID_osoba}")]
@@ -130,7 +94,7 @@ namespace PRO_API.Controllers
                 await Mediator.Send(new UpdateGodzinyPracyCommand
                 {
                     ID_osoba = ID_osoba,
-                    requestList = new List<GodzinyPracyRequest>() { request }
+                    Request = request 
                 }, token);
             }
             catch (Exception e)
@@ -150,7 +114,7 @@ namespace PRO_API.Controllers
                 await Mediator.Send(new DeleteGodzinyPracyCommand
                 {
                     ID_osoba = ID_osoba,
-                    dzien = day
+                    Day = day
                 }, token);
             }
             catch (Exception)

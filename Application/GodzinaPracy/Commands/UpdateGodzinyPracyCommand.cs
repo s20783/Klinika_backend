@@ -1,12 +1,9 @@
 ﻿using Application.DTO.Requests;
 using Application.Interfaces;
-using Domain.Enums;
-using Domain.Models;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,7 +12,7 @@ namespace Application.GodzinaPracy.Commands
     public class UpdateGodzinyPracyCommand : IRequest<int>
     {
         public string ID_osoba { get; set; }
-        public List<GodzinyPracyRequest> requestList { get; set; }
+        public GodzinyPracyRequest Request { get; set; }
     }
 
     public class UpdateGodzinyPracyCommandHandle : IRequestHandler<UpdateGodzinyPracyCommand, int>
@@ -31,31 +28,17 @@ namespace Application.GodzinaPracy.Commands
         public async Task<int> Handle(UpdateGodzinyPracyCommand req, CancellationToken cancellationToken)
         {
             int id = _hash.Decode(req.ID_osoba);
-            var list = _context.GodzinyPracies.Where(x => x.IdOsoba == id).ToList();
-            if (!list.Any())
+            var day = await _context.GodzinyPracies
+                .Where(x => x.IdOsoba == id && x.DzienTygodnia == req.Request.DzienTygodnia)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (day == null)
             {
-                throw new Exception("Ten pracownik nie ma ustawionych godzin pracy.");
+                throw new Exception("Ten pracownik nie ma ustawionych godzin pracy tego dnia.");
             }
 
-            foreach (GodzinyPracyRequest request in req.requestList)
-            {
-                var dzien = list.Where(x => x.DzienTygodnia == request.DzienTygodnia).FirstOrDefault();
-                /*if(dzien == null)
-                {
-                    context.GodzinyPracies.Add(new GodzinyPracy
-                    {
-                        DzienTygodnia = request.DzienTygodnia,
-                        GodzinaRozpoczecia = request.GodzinaRozpoczecia,
-                        GodzinaZakonczenia = request.GodzinaZakonczenia,
-                        IdOsoba = id
-                    });
-                } 
-                else
-                {*/
-                    dzien.GodzinaRozpoczecia = request.GodzinaRozpoczecia;
-                    dzien.GodzinaZakonczenia = request.GodzinaZakonczenia;
-                //}
-            }
+            day.GodzinaRozpoczecia = req.Request.GodzinaRozpoczecia;
+            day.GodzinaZakonczenia = req.Request.GodzinaZakonczenia;
 
             return await _context.SaveChangesAsync(cancellationToken);
         }

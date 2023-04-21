@@ -1,14 +1,9 @@
-﻿using Application.DTO.Requests;
-using Application.Interfaces;
-using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Domain.Enums;
+﻿using Application.Interfaces;
 using Domain;
 using Domain.Models;
+using MediatR;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Application.GodzinaPracy.Commands
 {

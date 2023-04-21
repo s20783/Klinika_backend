@@ -90,25 +90,35 @@ namespace PRO_API.Controllers
         }
 
 
-        [AuthorizeRoles(RolaEnum.Admin, RolaEnum.Weterynarz)]
+        [AuthorizeRoles(RolaEnum.Admin)]
         [HttpGet("klinika")]
         public async Task<IActionResult> GetKlinikaHarmonogram(DateTime date, CancellationToken token)
         {
             try
             {
-                if (isWeterynarz())
-                {
-                    return Ok(await Mediator.Send(new HarmonogramWeterynarzQuery
-                    {
-                        ID_osoba = GetUserId(),
-                        Date = date
-                    }, token));
-                }
-
                 return Ok(await Mediator.Send(new HarmonogramAdminQuery
                 {
                     Date = date
-                }));
+                }, token));
+            }
+            catch (Exception)
+            {
+                return NotFound();
+            }
+        }
+
+
+        [AuthorizeRoles(RolaEnum.Weterynarz)]
+        [HttpGet("moj_harmonogram")]
+        public async Task<IActionResult> GetWeterynarzHarmonogram(DateTime date, CancellationToken token)
+        {
+            try
+            {
+                return Ok(await Mediator.Send(new HarmonogramWeterynarzQuery
+                {
+                    ID_osoba = GetUserId(),
+                    Date = date
+                }, token));
             }
             catch (Exception)
             {

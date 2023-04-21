@@ -77,7 +77,7 @@ namespace Test.Mock
             var command = new UpdateGodzinyPracyCommand()
             {
                 ID_osoba = hash.Encode(2),
-                requestList = new List<GodzinyPracyRequest>{
+                Request = new List<GodzinyPracyRequest>{
                     new GodzinyPracyRequest
                     {
                         DzienTygodnia = 1,
@@ -99,7 +99,7 @@ namespace Test.Mock
             var command = new UpdateGodzinyPracyCommand()
             {
                 ID_osoba = hash.Encode(2),
-                requestList = new List<GodzinyPracyRequest>{
+                Request = new List<GodzinyPracyRequest>{
                     new GodzinyPracyRequest
                     {
                         DzienTygodnia = 6,
@@ -122,7 +122,7 @@ namespace Test.Mock
             var command = new DeleteGodzinyPracyCommand()
             {
                 ID_osoba = hash.Encode(2),
-                dzien = 1
+                Day = 1
             };
             
             await handler.Handle(command, CancellationToken.None);
@@ -139,7 +139,7 @@ namespace Test.Mock
             var command = new DeleteGodzinyPracyCommand()
             {
                 ID_osoba = hash.Encode(2),
-                dzien = 6
+                Day = 6
             };
 
             Assert.ThrowsAsync<Exception>(async () => await handler.Handle(command, CancellationToken.None));

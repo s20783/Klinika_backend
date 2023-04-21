@@ -1,9 +1,4 @@
 ﻿using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.GodzinaPracy.Commands
 {
@@ -13,7 +8,7 @@ namespace Application.GodzinaPracy.Commands
         {
             RuleFor(x => x.ID_osoba).NotEmpty();
 
-            RuleFor(x => x.dzien).NotEmpty();
+            RuleFor(x => x.Day).NotEmpty();
         }
     }
 }

@@ -44,28 +44,25 @@ namespace Application.Konto.Commands
 
             List<Claim> userclaim = new List<Claim>
             {
-                new Claim("idUser", _hash.Encode(user.IdOsoba)),
-                new Claim("login", user.NazwaUzytkownika)
+                new Claim("idUser", _hash.Encode(user.IdOsoba))
             };
 
             if (user.IdRola == ((int)RolaEnum.Admin))
             {
-                userclaim.Add(new Claim(ClaimTypes.Role, "Admin"));
+                userclaim.Add(new Claim(ClaimTypes.Role, RolaEnum.Admin.ToString()));
             }
             else if (user.IdRola == ((int)RolaEnum.Weterynarz))
             {
-                userclaim.Add(new Claim(ClaimTypes.Role, "Weterynarz"));
+                userclaim.Add(new Claim(ClaimTypes.Role, RolaEnum.Weterynarz.ToString()));
             }
             else
             {
-                userclaim.Add(new Claim(ClaimTypes.Role, "Klient"));
+                userclaim.Add(new Claim(ClaimTypes.Role, RolaEnum.Klient.ToString()));
             }
-
-            var token = _tokenRepository.GetJWT(userclaim);
 
             return new 
             { 
-                accessToken = token
+                accessToken = _tokenRepository.GetJWT(userclaim)
             };
         }
     }

@@ -1,9 +1,5 @@
 ﻿using FluentValidation;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.GodzinaPracy.Commands
 {
@@ -13,7 +9,7 @@ namespace Application.GodzinaPracy.Commands
         {
             RuleFor(x => x.ID_osoba).NotEmpty();
 
-            RuleFor(x => x.requestList).ForEach(y => y.Where(s => s.GodzinaRozpoczecia > new TimeSpan(7, 0, 0)));
+            RuleFor(x => x.Request.GodzinaRozpoczecia).GreaterThanOrEqualTo(new TimeSpan(7, 0, 0));
         }
     }
 }

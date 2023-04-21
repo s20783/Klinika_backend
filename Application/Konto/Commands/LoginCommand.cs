@@ -49,31 +49,28 @@ namespace Application.Konto.Commands
 
             List<Claim> userclaim = new List<Claim>
             {
-                new Claim("idUser", _hash.Encode(user.IdOsoba)),
-                new Claim("login", user.NazwaUzytkownika)
+                new Claim("idUser", _hash.Encode(user.IdOsoba))
             };
 
             string userRola = "";
 
-
             if (user.IdRola == ((int)RolaEnum.Admin))
             {
-                userclaim.Add(new Claim(ClaimTypes.Role, "Admin"));
-                userRola = "admin";
+                userclaim.Add(new Claim(ClaimTypes.Role, RolaEnum.Admin.ToString()));
+                userRola = RolaEnum.Admin.ToString();
             }
             else if (user.IdRola == ((int)RolaEnum.Weterynarz))
             {
-                userclaim.Add(new Claim(ClaimTypes.Role, "Weterynarz"));
-                userRola = "weterynarz";
+                userclaim.Add(new Claim(ClaimTypes.Role, RolaEnum.Weterynarz.ToString()));
+                userRola = RolaEnum.Weterynarz.ToString();
             }
             else
             {
-                userclaim.Add(new Claim(ClaimTypes.Role, "Klient"));
+                userclaim.Add(new Claim(ClaimTypes.Role, RolaEnum.Klient.ToString()));
                 userRola = "user";
             }
 
             var token = _tokenRepository.GetJWT(userclaim);
-
             var refreshToken = Guid.NewGuid().ToString();
             user.RefreshToken = refreshToken;
             user.RefreshTokenExp = DateTime.Now.AddDays(1);
