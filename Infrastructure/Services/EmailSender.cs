@@ -19,10 +19,10 @@ namespace Infrastructure.Services
             _emailConfig = emailConfig;
         }
 
-        public async Task SendSzczepienieEmail(string to, DateTime data, string pacjent)
+        public async Task SendVaccinationEmail(string to, DateTime data, string patient)
         {
-            var culture = new System.Globalization.CultureInfo("pl-PL");
-            var day = culture.DateTimeFormat.GetDayName(DateTime.Today.DayOfWeek);
+            /*var culture = new System.Globalization.CultureInfo("pl-PL");
+            var day = culture.DateTimeFormat.GetDayName(DateTime.Today.DayOfWeek);*/
             string termin = data.ToShortDateString();
 
             var body = string.Format(
@@ -42,7 +42,7 @@ namespace Infrastructure.Services
                "</p>" +
                "<p style='font - family: Arial, Helvetica, sans - serif;'>" +
                "222 444 555" +
-               "</p>", termin, pacjent);
+               "</p>", termin, patient);
 
             var email = CreateEmail(to, "Przypomnienie o szczepieniu");
             var bodyBuilder = new BodyBuilder { HtmlBody = body };
@@ -52,7 +52,7 @@ namespace Infrastructure.Services
         }
 
 
-        public async Task SendPrzypomnienieEmail(string to, DateTime data, string weterynarz)
+        public async Task SendReminderEmail(string to, DateTime data, string weterynarz)
         {
             var culture = new System.Globalization.CultureInfo("pl-PL");
             var day = culture.DateTimeFormat.GetDayName(DateTime.Today.DayOfWeek);
@@ -85,7 +85,7 @@ namespace Infrastructure.Services
         }
 
 
-        public async Task SendHasloEmail(string to, string createdPassword)
+        public async Task SendPasswordEmail(string to, string createdPassword)
         {
             var body = string.Format(
                "<h2>" +
@@ -112,7 +112,7 @@ namespace Infrastructure.Services
             await Send(email);
         }
 
-        public async Task SendUmowWizytaEmail(string to, DateTime data, string weterynarz)
+        public async Task SendCreatedVisitEmail(string to, DateTime data, string weterynarz)
         {
             var culture = new System.Globalization.CultureInfo("pl-PL");
             var day = culture.DateTimeFormat.GetDayName(DateTime.Today.DayOfWeek);
@@ -144,7 +144,7 @@ namespace Infrastructure.Services
             await Send(email);
         }
 
-        public async Task SendAnulujWizyteEmail(string to, DateTime data)
+        public async Task SendCancelledVisitEmail(string to, DateTime data)
         {
             var culture = new System.Globalization.CultureInfo("pl-PL");
             var day = culture.DateTimeFormat.GetDayName(DateTime.Today.DayOfWeek);

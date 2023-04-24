@@ -11,16 +11,16 @@ namespace Infrastructure.Services
 {
     public class TokenService : IToken
     {
-        private readonly IConfiguration configuration;
+        private readonly IConfiguration _configuration;
         
         public TokenService(IConfiguration config)
         {
-            configuration = config;
+            _configuration = config;
         }
 
         public string GetJWT(List<Claim> claims)
         {
-            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["SecretKey"]));
+            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["SecretKey"]));
             SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
 
             JwtSecurityToken token = new JwtSecurityToken(

@@ -1,15 +1,16 @@
-﻿using System.Threading.Tasks;
+﻿using Domain.Models;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Application.Interfaces
 {
     public interface ISchedule
     {
-        void SendPrzypomnienieEmail();
+        int ScheduleCount(GodzinyPracy godziny);
 
-        Task DeleteWizytaSystemAsync();
+        Task DeleteSchedules(List<Harmonogram> schedules, IKlinikaContext context);
 
-        void SendSzczepienieEmail();
-
-        Task CreateHarmonogramsBySystem();
+        void CreateVetSchedules(IKlinikaContext context, DateTime date, int id);
     }
 }

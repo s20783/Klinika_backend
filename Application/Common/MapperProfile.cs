@@ -19,56 +19,56 @@ namespace Application.Common
         {
             _hash = hash;
 
-            CreateMap<ChorobaLek, GetChorobaResponse>()
+            CreateMap<ChorobaLek, GetDiseaseResponse>()
                 .ForMember(x => x.ID_Choroba, y => y.MapFrom(s => _hash.Encode(s.IdChoroba)))
                 .ForMember(x => x.Nazwa, y => y.MapFrom(s => s.IdChorobaNavigation.Nazwa))
                 .ForMember(x => x.Opis, y => y.MapFrom(s => s.IdChorobaNavigation.Opis))
                 .ForMember(x => x.NazwaLacinska, y => y.MapFrom(s => s.IdChorobaNavigation.NazwaLacinska));
 
-            CreateMap<Choroba, GetChorobaResponse>()
+            CreateMap<Choroba, GetDiseaseResponse>()
                 .ForMember(x => x.ID_Choroba, y => y.MapFrom(s => _hash.Encode(s.IdChoroba)));
 
-            CreateMap<GodzinyPracy, GetGodzinyPracyResponse>();
+            CreateMap<GodzinyPracy, GetWorkingHoursResponse>();
 
-            CreateMap<Klient, GetKlientListResponse>()
+            CreateMap<Klient, GetClientListResponse>()
                 .ForMember(x => x.IdOsoba, y => y.MapFrom(s => _hash.Encode(s.IdOsoba)))
                 .ForMember(x => x.Imie, y => y.MapFrom(s => s.IdOsobaNavigation.Imie))
                 .ForMember(x => x.NumerTelefonu, y => y.MapFrom(s => s.IdOsobaNavigation.NumerTelefonu))
                 .ForMember(x => x.Nazwisko, y => y.MapFrom(s => s.IdOsobaNavigation.Nazwisko))
                 .ForMember(x => x.Email, y => y.MapFrom(s => s.IdOsobaNavigation.Email));
 
-            CreateMap<Osoba, GetKlientResponse>()
+            CreateMap<Osoba, GetClientResponse>()
                 .ForMember(x => x.DataZalozeniaKonta, y => y.MapFrom(s => s.Klient.DataZalozeniaKonta));
 
-            CreateMap<Osoba, GetKontoResponse>();
+            CreateMap<Osoba, GetAccountResponse>();
 
-            CreateMap<Lek, GetLekResponse>()
+            CreateMap<Lek, GetMedicamentResponse>()
                 .ForMember(x => x.IdLek, y => y.MapFrom(s => _hash.Encode(s.IdLek)));
 
-            CreateMap<LekWMagazynie, GetStanLekuResponse>();
+            CreateMap<LekWMagazynie, GetMedicamentWarehouseResponse>();
 
-            CreateMap<Pacjent, GetPacjentListResponse>()
+            CreateMap<Pacjent, GetPatientListResponse>()
                 .ForMember(x => x.IdPacjent, y => y.MapFrom(s => _hash.Encode(s.IdPacjent)))
                 .ForMember(x => x.IdOsoba, y => y.MapFrom(s => _hash.Encode(s.IdOsoba)))
                 .ForMember(x => x.Wlasciciel, y => y.MapFrom(s => s.IdOsobaNavigation.IdOsobaNavigation.Imie + " " + s.IdOsobaNavigation.IdOsobaNavigation.Nazwisko));
 
-            CreateMap<Pacjent, GetPacjentDetailsResponse>()
+            CreateMap<Pacjent, GetPatientDetailsResponse>()
                 .ForMember(x => x.IdOsoba, y => y.MapFrom(s => _hash.Encode(s.IdOsoba)))
                 .ForMember(x => x.Wlasciciel, y => y.MapFrom(s => s.IdOsobaNavigation.IdOsobaNavigation.Imie + " " + s.IdOsobaNavigation.IdOsobaNavigation.Nazwisko));
 
-            CreateMap<Pacjent, GetPacjentKlientListResponse>()
+            CreateMap<Pacjent, GetPatientKlientListResponse>()
                 .ForMember(x => x.IdPacjent, y => y.MapFrom(s => _hash.Encode(s.IdPacjent)));
 
-            CreateMap<ReceptaLek, GetReceptaLekResponse>()
+            CreateMap<ReceptaLek, GetPrescriptionMedicamentResponse>()
                 .ForMember(x => x.ID_Lek, y => y.MapFrom(s => _hash.Encode(s.IdLek)))
                 .ForMember(x => x.Nazwa, y => y.MapFrom(s => s.IdLekNavigation.Nazwa))
                 .ForMember(x => x.JednostkaMiary, y => y.MapFrom(s => s.IdLekNavigation.JednostkaMiary))
                 .ForMember(x => x.Producent, y => y.MapFrom(s => s.IdLekNavigation.Producent));
 
-            CreateMap<Specjalizacja, GetSpecjalizacjaResponse>()
+            CreateMap<Specjalizacja, GetSpecializationResponse>()
                 .ForMember(x => x.IdSpecjalizacja, y => y.MapFrom(s => _hash.Encode(s.IdSpecjalizacja)));
 
-            CreateMap<Szczepienie, GetSzczepienieResponse>()
+            CreateMap<Szczepienie, GetVaccinationResponse>()
                 .ForMember(x => x.IdSzczepienie, y => y.MapFrom(s => _hash.Encode(s.IdSzczepienie)))
                 .ForMember(x => x.IdPacjent, y => y.MapFrom(s => _hash.Encode(s.IdPacjent)))
                 .ForMember(x => x.IdLek, y => y.MapFrom(s => _hash.Encode(s.IdLek)))
@@ -77,20 +77,20 @@ namespace Application.Common
                 .ForMember(x => x.Dawka, y => y.MapFrom(s => s.Dawka))
                 .ForMember(x => x.Data, y => y.MapFrom(s => s.Data));
 
-            CreateMap<Szczepionka, GetSzczepionkaResponse>()
+            CreateMap<Szczepionka, GetVaccineResponse>()
                 .ForMember(x => x.ID_lek, y => y.MapFrom(s => _hash.Encode(s.IdLek)))
                 .ForMember(x => x.Nazwa, y => y.MapFrom(s => s.IdLekNavigation.Nazwa))
                 .ForMember(x => x.Producent, y => y.MapFrom(s => s.IdLekNavigation.Producent))
                 .ForMember(x => x.OkresWaznosci, y => y.MapFrom(s => getDate(s.OkresWaznosci)));
 
-            CreateMap<Urlop, GetUrlopResponse>()
+            CreateMap<Urlop, GetVacationResponse>()
                .ForMember(x => x.IdUrlop, y => y.MapFrom(s => _hash.Encode(s.IdUrlop)))
                .ForMember(x => x.Weterynarz, y => y.MapFrom(s => s.IdOsobaNavigation.IdOsobaNavigation.Imie + " " + s.IdOsobaNavigation.IdOsobaNavigation.Nazwisko));
 
-            CreateMap<Usluga, GetUslugaResponse>()
+            CreateMap<Usluga, GetServiceResponse>()
                .ForMember(x => x.ID_Usluga, y => y.MapFrom(s => _hash.Encode(s.IdUsluga)));
 
-            CreateMap<WizytaUsluga, GetUslugaResponse>()
+            CreateMap<WizytaUsluga, GetServiceResponse>()
                .ForMember(x => x.ID_Usluga, y => y.MapFrom(s => _hash.Encode(s.IdUsluga)))
                .ForMember(x => x.Dolegliwosc, y => y.MapFrom(s => s.IdUslugaNavigation.Dolegliwosc))
                .ForMember(x => x.NazwaUslugi, y => y.MapFrom(s => s.IdUslugaNavigation.NazwaUslugi))
@@ -98,33 +98,33 @@ namespace Application.Common
                .ForMember(x => x.Cena, y => y.MapFrom(s => s.IdUslugaNavigation.Cena))
                .ForMember(x => x.Narkoza, y => y.MapFrom(s => s.IdUslugaNavigation.Narkoza));
 
-            CreateMap<WizytaUsluga, GetUslugaPacjentResponse>()
+            CreateMap<WizytaUsluga, GetServicePatientResponse>()
                .ForMember(x => x.ID_Usluga, y => y.MapFrom(s => _hash.Encode(s.IdUsluga)))
                .ForMember(x => x.ID_wizyta, y => y.MapFrom(s => _hash.Encode(s.IdWizyta)))
                .ForMember(x => x.NazwaUslugi, y => y.MapFrom(s => s.IdUslugaNavigation.NazwaUslugi))
                .ForMember(x => x.Opis, y => y.MapFrom(s => s.IdUslugaNavigation.Opis))
                .ForMember(x => x.Data, y => y.MapFrom(s => s.IdWizytaNavigation.Harmonograms.Min(x => x.DataRozpoczecia)));
 
-            CreateMap<Osoba, GetWeterynarzListResponse>()
+            CreateMap<Osoba, GetVetListResponse>()
                .ForMember(x => x.IdOsoba, y => y.MapFrom(s => _hash.Encode(s.IdOsoba)));
 
-            CreateMap<Osoba, GetWeterynarzResponse>()
+            CreateMap<Osoba, GetVetResponse>()
                .ForMember(x => x.DataZatrudnienia, y => y.MapFrom(s => s.Weterynarz.DataZatrudnienia))
                .ForMember(x => x.DataUrodzenia, y => y.MapFrom(s => s.Weterynarz.DataUrodzenia))
                .ForMember(x => x.Pensja, y => y.MapFrom(s => s.Weterynarz.Pensja));
 
-            CreateMap<WeterynarzSpecjalizacja, GetSpecjalizacjaResponse>()
+            CreateMap<WeterynarzSpecjalizacja, GetSpecializationResponse>()
                .ForMember(x => x.IdSpecjalizacja, y => y.MapFrom(s => _hash.Encode(s.IdSpecjalizacja)))
                .ForMember(x => x.Nazwa, y => y.MapFrom(s => s.IdSpecjalizacjaNavigation.Nazwa))
                .ForMember(x => x.Opis, y => y.MapFrom(s => s.IdSpecjalizacjaNavigation.Opis));
 
-            CreateMap<WizytaChoroba, GetChorobaResponse>()
+            CreateMap<WizytaChoroba, GetDiseaseResponse>()
                .ForMember(x => x.ID_Choroba, y => y.MapFrom(s => _hash.Encode(s.IdChoroba)))
                .ForMember(x => x.Nazwa, y => y.MapFrom(s => s.IdChorobaNavigation.Nazwa))
                .ForMember(x => x.Opis, y => y.MapFrom(s => s.IdChorobaNavigation.Opis))
                .ForMember(x => x.NazwaLacinska, y => y.MapFrom(s => s.IdChorobaNavigation.NazwaLacinska));
 
-            CreateMap<WizytaLek, GetLekListResponse>()
+            CreateMap<WizytaLek, GetMedicamentListResponse>()
                .ForMember(x => x.IdLek, y => y.MapFrom(s => _hash.Encode(s.IdLek)))
                .ForMember(x => x.Nazwa, y => y.MapFrom(s => s.IdLekNavigation.Nazwa))
                .ForMember(x => x.JednostkaMiary, y => y.MapFrom(s => s.IdLekNavigation.JednostkaMiary))

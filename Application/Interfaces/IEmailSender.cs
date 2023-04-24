@@ -5,16 +5,16 @@ namespace Application.Interfaces
 {
     public interface IEmailSender
     {
-        Task SendHasloEmail(string to, string content);
+        Task SendPasswordEmail(string to, string content);
 
-        Task SendUmowWizytaEmail(string to, DateTime data, string weterynarz);
+        Task SendCreatedVisitEmail(string to, DateTime data, string vet);
 
-        Task SendAnulujWizyteEmail(string to, DateTime data);
+        Task SendCancelledVisitEmail(string to, DateTime data);
 
         Task SendCreateAccountEmail(string to);
 
-        Task SendPrzypomnienieEmail(string to, DateTime data, string weterynarz);
+        Task SendReminderEmail(string to, DateTime data, string vet);
 
-        Task SendSzczepienieEmail(string to, DateTime data, string pacjent);
+        Task SendVaccinationEmail(string to, DateTime data, string patient);
     }
 }

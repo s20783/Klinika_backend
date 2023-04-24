@@ -1,24 +1,20 @@
 ﻿using Application.Interfaces;
 using HashidsNet;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Services
 {
     public class HashService : IHash
     {
-        private readonly IHashids hashids;
-        public HashService(IHashids _hashids)
+        private readonly IHashids _hashids;
+        public HashService(IHashids hashids)
         {
-            hashids = _hashids;
+            _hashids = hashids;
         }
 
         public int Decode(string value)
         {
-            var idArray = hashids.Decode(value);
+            var idArray = _hashids.Decode(value);
             if (idArray.Length == 0)
             {
                 throw new Exception();
@@ -30,8 +26,8 @@ namespace Infrastructure.Services
 
         public (int, int) Decode(string value1, string value2)
         {
-            var idArray1 = hashids.Decode(value1);
-            var idArray2 = hashids.Decode(value2);
+            var idArray1 = _hashids.Decode(value1);
+            var idArray2 = _hashids.Decode(value2);
             if (idArray1.Length == 0 || idArray2.Length == 0)
             {
                 throw new Exception();
@@ -44,7 +40,7 @@ namespace Infrastructure.Services
 
         public string Encode(int value)
         {
-            return hashids.Encode(value);
+            return _hashids.Encode(value);
         }
     }
 }

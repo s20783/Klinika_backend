@@ -170,16 +170,16 @@ namespace PRO_API
             });
 
 
-            recurringJobManager.AddOrUpdate<ScheduleService>("create harmonograms by system", service => service.CreateHarmonogramsBySystem(), "0 6 * * 1");
+            recurringJobManager.AddOrUpdate("create harmonograms by system", (Infrastructure.SystemScheduleService service) => service.CreateSchedulesBySystem(), "0 6 * * 1");
 
             //wyœlij Email z przypomnieniem o wizycie dzieñ przed wizyt¹, uruchamiane raz dziennie o 8:00
-            recurringJobManager.AddOrUpdate<ScheduleService>("send wizyta email", service => service.SendPrzypomnienieEmail(), "0 8 * * *");
+            recurringJobManager.AddOrUpdate("send wizyta email", (Infrastructure.SystemScheduleService service) => service.SendReminderEmail(), "0 8 * * *");
 
             //wyœlij Email z przypomnieniem o nastêpnym obowi¹zkowym szczepieniu, uruchamiane co 2 tygodnie o 9:00
-            recurringJobManager.AddOrUpdate<ScheduleService>("send szczepienie email", service => service.SendSzczepienieEmail(), "0 9 */14 * *");
+            recurringJobManager.AddOrUpdate("send szczepienie email", (Infrastructure.SystemScheduleService service) => service.SendVaccinationEmail(), "0 9 */14 * *");
 
             //co poniedzia³ek
-            recurringJobManager.AddOrUpdate<ScheduleService>("delete cancelled appointments", service => service.DeleteWizytaSystemAsync(), "0 7 * * 1");
+            recurringJobManager.AddOrUpdate("delete cancelled appointments", (Infrastructure.SystemScheduleService service) => service.DeleteWizytaSystemAsync(), "0 7 * * 1");
         }
     }
 }

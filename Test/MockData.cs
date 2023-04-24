@@ -340,7 +340,7 @@ namespace Test
                     IdWizyta = 1,
                     IdOsoba = 1,
                     IdPacjent = 1,
-                    Status = WizytaStatus.Zaplanowana.ToString(),
+                    Status = VisitStatus.Zaplanowana.ToString(),
                     Cena = 200,
                     CzyZaakceptowanaCena = false
                 },
@@ -349,7 +349,7 @@ namespace Test
                     IdWizyta = 2,
                     IdOsoba = 1,
                     IdPacjent = 1,
-                    Status = WizytaStatus.Zrealizowana.ToString(),
+                    Status = VisitStatus.Zrealizowana.ToString(),
                     Cena = 200,
                     CzyZaakceptowanaCena = true
                 },
@@ -358,77 +358,77 @@ namespace Test
                     IdWizyta = 3,
                     IdOsoba = 4,
                     IdPacjent = 1,
-                    Status = WizytaStatus.Zaplanowana.ToString()
+                    Status = VisitStatus.Zaplanowana.ToString()
                 },
                 new Wizytum
                 {
                     IdWizyta = 4,
                     IdOsoba = 4,
                     IdPacjent = 1,
-                    Status = WizytaStatus.Zaplanowana.ToString()
+                    Status = VisitStatus.Zaplanowana.ToString()
                 },
                 new Wizytum
                 {
                     IdWizyta = 5,
                     IdOsoba = 4,
                     IdPacjent = 1,
-                    Status = WizytaStatus.Zaplanowana.ToString()
+                    Status = VisitStatus.Zaplanowana.ToString()
                 },
                 new Wizytum
                 {
                     IdWizyta = 6,
                     IdOsoba = 4,
                     IdPacjent = 1,
-                    Status = WizytaStatus.Zaplanowana.ToString()
+                    Status = VisitStatus.Zaplanowana.ToString()
                 },
                 new Wizytum
                 {
                     IdWizyta = 7,
                     IdOsoba = 4,
                     IdPacjent = 1,
-                    Status = WizytaStatus.Zaplanowana.ToString()
+                    Status = VisitStatus.Zaplanowana.ToString()
                 },
                 new Wizytum
                 {
                     IdWizyta = 8,
                     IdOsoba = 4,
                     IdPacjent = 1,
-                    Status = WizytaStatus.Zaplanowana.ToString()
+                    Status = VisitStatus.Zaplanowana.ToString()
                 },
                 new Wizytum
                 {
                     IdWizyta = 9,
                     IdOsoba = 4,
                     IdPacjent = 1,
-                    Status = WizytaStatus.Zaplanowana.ToString()
+                    Status = VisitStatus.Zaplanowana.ToString()
                 },
                 new Wizytum
                 {
                     IdWizyta = 10,
                     IdOsoba = 4,
                     IdPacjent = 1,
-                    Status = WizytaStatus.Zaplanowana.ToString()
+                    Status = VisitStatus.Zaplanowana.ToString()
                 },
                 new Wizytum
                 {
                     IdWizyta = 11,
                     IdOsoba = 4,
                     IdPacjent = 1,
-                    Status = WizytaStatus.Zaplanowana.ToString()
+                    Status = VisitStatus.Zaplanowana.ToString()
                 },
                 new Wizytum
                 {
                     IdWizyta = 12,
                     IdOsoba = 4,
                     IdPacjent = 1,
-                    Status = WizytaStatus.Zaplanowana.ToString()
+                    Status = VisitStatus.Zaplanowana.ToString()
                 },
                 new Wizytum
                 {
                     IdWizyta = 13,
                     IdOsoba = 4,
                     IdPacjent = 1,
-                    Status = WizytaStatus.Zaplanowana.ToString()
+                    Status = VisitStatus.Zaplanowana.ToString()
                 },
             };
         }

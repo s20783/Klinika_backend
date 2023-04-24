@@ -43,7 +43,7 @@ namespace PRO_API.Controllers
         protected bool isAdmin()
         {
             var role = GetUserRole();
-            if (role.Equals(nameof(RolaEnum.Admin)))
+            if (role.Equals(nameof(RoleEnum.Admin)))
             {
                 return true;
             }
@@ -54,7 +54,7 @@ namespace PRO_API.Controllers
         protected bool isWeterynarz()
         {
             var role = GetUserRole();
-            if (role.Equals(nameof(RolaEnum.Weterynarz)))
+            if (role.Equals(nameof(RoleEnum.Weterynarz)))
             {
                 return true;
             }
@@ -65,7 +65,7 @@ namespace PRO_API.Controllers
         protected bool isKlient()
         {
             var role = GetUserRole();
-            if (role.Equals(nameof(RolaEnum.Klient)))
+            if (role.Equals(nameof(RoleEnum.Klient)))
             {
                 return true;
             }

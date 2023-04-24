@@ -14,19 +14,19 @@ namespace Infrastructure
             services.AddScoped<IToken, TokenService>();
             services.AddScoped<IPassword, PasswordService>();
             services.AddScoped<IHash, HashService>();
-            services.AddScoped<IWizyta, WizytaService>();
+            services.AddScoped<IVisit, VisitService>();
             services.AddScoped<ILogin, LoginService>();
-            services.AddScoped<IHarmonogram, HarmonogramService>();
+            services.AddScoped<ISchedule, Services.ScheduleService>();
             services.AddScoped<IEmailSender, EmailSender>();
 
-            services.AddScoped<ICache<GetPacjentListResponse>, PacjentCache>();
-            services.AddScoped<ICache<GetChorobaResponse>, ChorobaCache>();
-            services.AddScoped<ICache<GetSpecjalizacjaResponse>, SpecjalizacjaCache>();
-            services.AddScoped<ICache<GetKlientListResponse>, KlientCache>();
-            services.AddScoped<ICache<GetUslugaResponse>, UslugaCache>();
-            services.AddScoped<ICache<GetWeterynarzListResponse>, WeterynarzCache>();
+            services.AddScoped<ICache<GetPatientListResponse>, PatientCache>();
+            services.AddScoped<ICache<GetDiseaseResponse>, DiseaseCache>();
+            services.AddScoped<ICache<GetSpecializationResponse>, SpecializationCache>();
+            services.AddScoped<ICache<GetClientListResponse>, ClientCache>();
+            services.AddScoped<ICache<GetServiceResponse>, ServiceCache>();
+            services.AddScoped<ICache<GetVetListResponse>, vetCache>();
 
-            services.AddTransient<ISchedule, ScheduleService>();
+            services.AddTransient<ISystemSchedule, SystemScheduleService>();
 
             services.AddScoped<IKlinikaContext, KlinikaContext>();
 
