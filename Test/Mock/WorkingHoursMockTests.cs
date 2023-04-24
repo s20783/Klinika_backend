@@ -2,15 +2,12 @@
 using Application.GodzinaPracy.Commands;
 using Application.Interfaces;
 using Domain;
-using Domain.Enums;
 using HashidsNet;
 using Infrastructure.Services;
 using Moq;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -54,14 +51,12 @@ namespace Test.Mock
             var command = new CreateWorkingHoursCommand()
             {
                 ID_osoba = hash.Encode(2),
-                requestList = new List<WorkingHoursRequest>{
-                    new WorkingHoursRequest
+                Request = new WorkingHoursRequest
                     {
                         DzienTygodnia = 7,
                         GodzinaRozpoczecia = new TimeSpan(9, 0, 0),
                         GodzinaZakonczenia = new TimeSpan(17, 0, 0)
                     }
-                }
             };
             
             await handler.Handle(command, CancellationToken.None);
@@ -77,14 +72,12 @@ namespace Test.Mock
             var command = new UpdateWorkingHoursCommand()
             {
                 ID_osoba = hash.Encode(2),
-                Request = new List<WorkingHoursRequest>{
-                    new WorkingHoursRequest
+                Request = new WorkingHoursRequest
                     {
                         DzienTygodnia = 1,
                         GodzinaRozpoczecia = new TimeSpan(9, 0, 0),
                         GodzinaZakonczenia = new TimeSpan(17, 0, 0)
                     }
-                }
             };
 
             await handler.Handle(command, CancellationToken.None);
@@ -99,14 +92,12 @@ namespace Test.Mock
             var command = new UpdateWorkingHoursCommand()
             {
                 ID_osoba = hash.Encode(2),
-                Request = new List<WorkingHoursRequest>{
-                    new WorkingHoursRequest
+                Request = new WorkingHoursRequest
                     {
                         DzienTygodnia = 6,
                         GodzinaRozpoczecia = new TimeSpan(9, 0, 0),
                         GodzinaZakonczenia = new TimeSpan(17, 0, 0)
                     }
-                }
             };
 
             Assert.That(!mockContext.Object.GodzinyPracies.Where(x => x.DzienTygodnia == 6 && x.IdOsoba == 2).Any());

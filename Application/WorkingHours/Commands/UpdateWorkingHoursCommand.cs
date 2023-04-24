@@ -28,9 +28,9 @@ namespace Application.GodzinaPracy.Commands
         public async Task<int> Handle(UpdateWorkingHoursCommand req, CancellationToken cancellationToken)
         {
             int id = _hash.Decode(req.ID_osoba);
-            var day = await _context.GodzinyPracies
+            var day = _context.GodzinyPracies
                 .Where(x => x.IdOsoba == id && x.DzienTygodnia == req.Request.DzienTygodnia)
-                .FirstOrDefaultAsync(cancellationToken);
+                .FirstOrDefault();
 
             if (day == null)
             {

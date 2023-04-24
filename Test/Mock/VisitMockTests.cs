@@ -178,7 +178,7 @@ namespace Test.Mock
         [Test]
         public async Task DeleteWizytaAdminShouldBeCorrectTest()
         {
-            var handler = new DeleteWizytaAdminCommandHandler(mockContext.Object, hash, new VisitService(), new MockEmailSender());
+            var handler = new DeleteWizytaAdminCommandHandler(mockContext.Object, hash, new MockEmailSender());
 
             DeleteVisitAdminCommand command = new DeleteVisitAdminCommand()
             {
@@ -193,7 +193,7 @@ namespace Test.Mock
         [Test]
         public void DeleteWizytaAdminShouldThrowAnExceptionTest()
         {
-            var handler = new DeleteWizytaAdminCommandHandler(mockContext.Object, hash, new VisitService(), new MockEmailSender());
+            var handler = new DeleteWizytaAdminCommandHandler(mockContext.Object, hash, new MockEmailSender());
 
             DeleteVisitAdminCommand command = new DeleteVisitAdminCommand()
             {
