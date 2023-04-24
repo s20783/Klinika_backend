@@ -1,10 +1,11 @@
 # ASP .NET Core Web API "Klinika"
 
 
-
 Główne narzędzia użyte w projekcie: MS SQL Server, .NET Core 6 Web API, Entity Framework, MediatR.
 
+Strona jest dostępna pod adresem: https://klinika-petmed.azurewebsites.net/
 
+Frontend jest do tej aplikacji jest dostępny tutaj: https://github.com/s20783/Klinika_frontend
 
 
 
